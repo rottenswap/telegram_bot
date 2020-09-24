@@ -16,7 +16,7 @@ def get_url_meme():
     contents=requests.get("https://api.github.com/repos/rottenswap/rottenswap.org-website/contents/docs/memes").json()
     potential_memes = []
     for file in contents:
-        if ('png' in file['name'] or 'jpg' in file['name'] or 'jpeg' in file['name']):
+        if ('png' in file['name'] or 'jpg' in file['name'] or 'jpeg' in file['name'] or 'mp4' in file['name']):
             potential_memes.append(file['download_url'])
     url = random.choice(potential_memes)
     return url
