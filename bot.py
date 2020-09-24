@@ -121,16 +121,6 @@ See the full instructions on https://pastebin.pl/view/raw/3db66672"""
     chat_id = update.message.chat_id
     bot.send_message(chat_id=chat_id, text=text, parse_mode='html')
 
-def timetocut(bot, update):
-    a = time.time()
-    t = 1600896983 - a
-    r = 'Emissions will be cut in %d hours, %d minutes, %d seconds' % (t//3600, t%3600//60, t%60)
-    chat_id = update.message.chat_id
-    bot.send_message(chat_id=chat_id, text=str(r))
-
-
-###### EXPERIMENTAL
-
 last_time_since_check = 0
 
 def callback_4chan_thread(bot, job):
@@ -148,8 +138,7 @@ def callback_4chan_thread(bot, job):
 def callback_timer(bot, update, job_queue):
     bot.send_message(chat_id=update.message.chat_id, text='gotcha')
     job_queue.run_repeating(callback_4chan_thread, 300, context=update.message.chat_id)
-
-######
+    
 
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE')
@@ -158,7 +147,6 @@ def main():
     dp.add_handler(CommandHandler('rottedChart', chart))
     dp.add_handler(CommandHandler('maggotChart',chartMaggot))
     dp.add_handler(CommandHandler('rotfarmingguide',stakeCommand))
-    dp.add_handler(CommandHandler('timetocut',timetocut))
     dp.add_handler(CommandHandler('howtoslippage',howtoslippage))
     dp.add_handler(CommandHandler('getuniswap',getuniswap))
     dp.add_handler(CommandHandler('supplycap',getSupplyCap))
@@ -175,7 +163,6 @@ rotme - give me a random meme
 rottedchart - get the charts of $ROT
 maggotchart - get the charts of $MAGGOTS
 rotfarmingguide - guide to $ROT farming
-timetocut - How long until emission cuts
 howtoslippage - How to increase slippage
 getuniswap - Get the uniswap pages
 supplycap - How ROTTED are we
