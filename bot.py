@@ -137,6 +137,7 @@ def callback_4chan_thread(bot, job):
     if not biz:
         meme_url = get_url_meme()
         last_time_since_check += 5
+        print("sending 4chan reminder, no post for " + str(last_time_since_check))
         meme_caption = "There hasn't been a Rotten /biz/ thread in the last " + str(last_time_since_check) + " minutes. Plz go make one https://boards.4channel.org/biz/, here's a meme."
         bot.send_photo(chat_id=job.context, photo=meme_url, caption=meme_caption)
         #bot.send_message(chat_id=job.context, text='No /biz/ threads for a while. Let\'s go make one!')
