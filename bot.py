@@ -132,6 +132,7 @@ last_time_since_check = 0
 
 # callback function that sends a reminder if no /biz/ threads are rooting
 def callback_4chan_thread(bot, job):
+    global last_time_since_check
     biz = getBizThreads()
     if not biz:
         meme_url = get_url_meme()
