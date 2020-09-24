@@ -39,7 +39,7 @@ def getSupplyCap(bot, update):
     request_maggot=round(int(requests.post(maggotAddr).json()['result']) / decimals)
     number_rot = locale.format_string("%d", request_rot, grouping=True)
     number_maggots = locale.format_string("%d", request_maggot, grouping=True)
-    message = "It's <b>ROTTING</b> around here! There's <pre>" + str(number_rot) + "</pre> ROTS and <pre>" + str(number_maggots) + "</pre> MAGGOTS"
+    message = "It's <b>ROTTING</b> around here! There are <pre>" + str(number_rot) + "</pre> ROTS and <pre>" + str(number_maggots) + "</pre> MAGGOTS"
     chat_id = update.message.chat_id
     bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
