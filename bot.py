@@ -136,7 +136,7 @@ def callback_4chan_thread(bot, job):
     biz = getBizThreads()
     if not biz:
         meme_url = get_url_meme()
-        last_time_since_check += 5
+        last_time_since_check += 15
         print("sending 4chan reminder, no post for " + str(last_time_since_check))
         meme_caption = "There hasn't been a Rotten /biz/ thread in the last " + str(last_time_since_check) + " minutes. Plz go make one https://boards.4channel.org/biz/, here's a meme."
         bot.send_photo(chat_id=job.context, photo=meme_url, caption=meme_caption)
@@ -147,7 +147,7 @@ def callback_4chan_thread(bot, job):
 
 def callback_timer(bot, update, job_queue):
     bot.send_message(chat_id=update.message.chat_id, text='gotcha')
-    job_queue.run_repeating(callback_4chan_thread, 300, context=update.message.chat_id)
+    job_queue.run_repeating(callback_4chan_thread, 900, context=update.message.chat_id)
     
 
 def main():
