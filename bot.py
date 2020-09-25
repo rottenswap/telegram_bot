@@ -1,4 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, BaseFilter
+from twython import Twython
 import requests
 import time
 import re
@@ -7,9 +8,27 @@ import locale
 import os
 
 etherscan_api_key = os.environ.get('ETH_API_KEY')
+APP_KEY = os.environ.get('TWITTER_API_KEY')
+APP_SECRET = os.environ.get('TWITTER_API_KEY_SECRET')
+ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
+ACCESS_SECRET_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 locale.setlocale(locale.LC_ALL, 'en_US')
 
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting')
+
+twitter = Twython(APP_KEY, APP_SECRET, ACCESS_TOKEN, ACCESS_SECRET_TOKEN)
+
+how_many_tweets = 3
+
+
+## UTIL
+def format_tweet(tweet):
+    tweet_id = tweet['id_str']
+    url = "twitter.com/anyuser/status/" + tweet_id
+    message = tweet['text'].replace("\n", "")
+    user = tweet['user']['screen_name']
+    message = "@" + user + " -- " + message[0:100] + " -- " + url + "\n"
+    return message
 
 # scraps the github project to get those sweet memes. Will chose one randomly and send it.
 def get_url_meme():
@@ -52,8 +71,7 @@ def getBizThreads():
     threadsIds = []
     for page in json:
         for thread in page['threads']:
-            try:
-                
+            try:                
                 if 'com' in thread:
                     com = thread['com']
                 else:
@@ -150,6 +168,22 @@ def callback_timer(bot, update, job_queue):
     job_queue.run_repeating(callback_4chan_thread, 900, context=update.message.chat_id)
     
 
+def getLastTweets(bot, update):
+    results = twitter.search(q='$ROT')
+    message = ""
+    if results.get('statuses'):
+        count = 0
+        tweets = results['statuses']
+        for tweet in tweets:
+            if ("RT " not in tweet['text']):
+                if (count < how_many_tweets):
+                    message = message + format_tweet(tweet)
+                    count = count + 1
+    chat_id = update.message.chat_id
+    bot.send_message(chat_id=chat_id, text=message)
+
+
+
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE')
     dp = updater.dispatcher
@@ -161,6 +195,7 @@ def main():
     dp.add_handler(CommandHandler('getuniswap',getuniswap))
     dp.add_handler(CommandHandler('supplycap',getSupplyCap))
     dp.add_handler(CommandHandler('4biz',getBiz))
+    dp.add_handler(CommandHandler('twitter',getLastTweets))
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     updater.start_polling()
     updater.idle()
@@ -169,14 +204,15 @@ if __name__ == '__main__':
     main()
 
 commands = """
-rotme - give me a random meme
-rottedchart - get the charts of $ROT
-maggotchart - get the charts of $MAGGOTS
-rotfarmingguide - guide to $ROT farming
+rotme - Give me a random meme
+rottedchart - Get the charts of $ROT
+maggotchart - Get the charts of $MAGGOTS
+rotfarmingguide - Guide to $ROT farming
 howtoslippage - How to increase slippage
 getuniswap - Get the uniswap pages
 supplycap - How ROTTED are we
-4biz - list biz thread
+4biz - List biz thread
+twitter - List twitter threads
 """
 
 
