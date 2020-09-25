@@ -170,7 +170,7 @@ def callback_timer(bot, update, job_queue):
 
 def getLastTweets(bot, update):
     results = twitter.search(q='$ROT rottenswap')
-    message = "Ppl are tweeting about ROT, go comment/like/RT: \n"
+    message = "Normies are tweeting about ROT, go comment/like/RT: \n"
     if results.get('statuses'):
         count = 0
         tweets = results['statuses']
