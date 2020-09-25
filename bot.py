@@ -27,7 +27,7 @@ def format_tweet(tweet):
     url = "twitter.com/anyuser/status/" + tweet_id
     message = tweet['text'].replace("\n", "")
     user = tweet['user']['screen_name']
-    message = user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
+    message = user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n \n"
     return message
 
 # scraps the github project to get those sweet memes. Will chose one randomly and send it.
