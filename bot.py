@@ -27,7 +27,7 @@ def format_tweet(tweet):
     url = "twitter.com/anyuser/status/" + tweet_id
     message = tweet['text'].replace("\n", "")
     user = tweet['user']['screen_name']
-    message = "@" + user + " -- " + message[0:100] + " -- " + url + "\n"
+    message = user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
     return message
 
 # scraps the github project to get those sweet memes. Will chose one randomly and send it.
@@ -170,7 +170,7 @@ def callback_timer(bot, update, job_queue):
 
 def getLastTweets(bot, update):
     results = twitter.search(q='$ROT')
-    message = ""
+    message = "Ppl are tweeting about ROT, go comment/like/RT: \n"
     if results.get('statuses'):
         count = 0
         tweets = results['statuses']
@@ -180,7 +180,7 @@ def getLastTweets(bot, update):
                     message = message + format_tweet(tweet)
                     count = count + 1
     chat_id = update.message.chat_id
-    bot.send_message(chat_id=chat_id, text=message)
+    bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
 
 
