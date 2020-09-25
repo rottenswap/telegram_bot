@@ -108,7 +108,7 @@ def getBiz(bot, update):
         bot.send_photo(chat_id=chat_id, photo=meme_url, caption=meme_caption)
     else:
         chat_id = update.message.chat_id
-        bot.send_message(chat_id=chat_id, text=message)
+        bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True)
 
 
 # sends the astrotools chart of the $ROT token
@@ -180,7 +180,7 @@ def getLastTweets(bot, update):
                     message = message + format_tweet(tweet)
                     count = count + 1
     chat_id = update.message.chat_id
-    bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
+    bot.send_message(chat_id=chat_id, text=message, parse_mode='html', disable_web_page_preview=True)
 
 
 
