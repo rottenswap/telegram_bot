@@ -27,7 +27,7 @@ def format_tweet(tweet):
     url = "twitter.com/anyuser/status/" + tweet_id
     message = tweet['text'].replace("\n", "")
     user = tweet['user']['screen_name']
-    message = user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n \n"
+    message = user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
     return message
 
 # scraps the github project to get those sweet memes. Will chose one randomly and send it.
@@ -166,21 +166,37 @@ def callback_4chan_thread(bot, job):
 def callback_timer(bot, update, job_queue):
     bot.send_message(chat_id=update.message.chat_id, text='gotcha')
     job_queue.run_repeating(callback_4chan_thread, 900, context=update.message.chat_id)
-    
 
-def getLastTweets(bot, update):
-    results = twitter.search(q='$ROT rottenswap')
-    message = "<b>Normies are tweeting about ROT, go comment/like/RT:</b>\n"
-    if results.get('statuses'):
+
+def queryTweets(easy = True):
+    if (easy):
+        return twitter.search(q='$ROT rottenswap')
+    else:
+        return twitter.search(q='$ROT')
+    
+def filterTweets(all_tweets):
+    message = ""
+    if all_tweets.get('statuses'):
         count = 0
-        tweets = results['statuses']
+        tweets = all_tweets['statuses']
         for tweet in tweets:
             if ("RT " not in tweet['text']):
                 if (count < how_many_tweets):
                     message = message + format_tweet(tweet)
                     count = count + 1
+    return message
+
+def getLastTweets(bot, update):
+    results = queryTweets()
+    message = "<b>Normies are tweeting about ROT, go comment/like/RT:</b>\n"
+    rest_message = filterTweets(results)
+    if rest_message == "":
+        print("empty tweets, fallback")
+        results = queryTweets(False)
+        rest_message = filterTweets(results)
+    full_message = message + rest_message
     chat_id = update.message.chat_id
-    bot.send_message(chat_id=chat_id, text=message, parse_mode='html', disable_web_page_preview=True)
+    bot.send_message(chat_id=chat_id, text=full_message, parse_mode='html', disable_web_page_preview=True)
 
 
 
