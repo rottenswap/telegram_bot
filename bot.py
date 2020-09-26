@@ -43,8 +43,15 @@ def format_tweet(tweet):
     tweet_id = tweet['id_str']
     url = "twitter.com/anyuser/status/" + tweet_id
     message = tweet['text'].replace("\n", "")
+    
+    time_tweet_creation = tweet['created_at']
+    new_datetime = datetime.strptime(time_tweet_creation,'%a %b %d %H:%M:%S +0000 %Y')
+    current_time = datetime.utcnow()
+    diff_time = current_time - new_datetime
+    minutessince = int(diff_time.total_seconds() / 60)
+    
     user = tweet['user']['screen_name']
-    message = user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
+    message = str(minutessince) + " mins ago " + user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
     return message
 
 
