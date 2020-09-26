@@ -334,12 +334,13 @@ def get_price_simple(update: Update, context: CallbackContext):
     dollar_per_rot = eth_per_rot / eth_per_usdt
     rot_per_eth = 1.0 / eth_per_rot
 
-    supply_cap_rot = number_to_beautiful(get_supply_cap_addr(rot_contract))
+    supply_cap_rot = get_supply_cap_addr(rot_contract)
+    supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
 
     message = "ETH: Ξ" + str(eth_per_rot)[0:10] \
               + "\nUSD: $" + str(dollar_per_rot)[0:10] \
-              + "\nsupply cat: " + supply_cap_rot \
+              + "\nsupply cat: " + supply_cat_pretty \
               + "\nmarket cap: $" + market_cap
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
