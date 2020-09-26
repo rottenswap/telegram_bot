@@ -1,6 +1,8 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, BaseFilter, CallbackContext, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, BaseFilter, \
+    CallbackContext, Filters
 from telegram import Update
 from twython import Twython
+from graphqlclient import GraphQLClient
 from PIL import Image
 from git import Repo
 from datetime import datetime, timedelta
@@ -12,6 +14,7 @@ import re
 import random
 import locale
 import os
+import json
 
 # ENV FILES
 etherscan_api_key = os.environ.get('ETH_API_KEY')
@@ -21,6 +24,11 @@ ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_SECRET_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 MEME_GIT_REPO = os.environ.get('MEME_GIT_REPO')
 TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
+
+# Graph QL requests
+req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
+req_graphql_usdt = '''{token(id: "0xdac17f958d2ee523a2206206994597c13d831ec7") {derivedETH}}'''
+graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
@@ -44,13 +52,13 @@ def format_tweet(tweet):
     tweet_id = tweet['id_str']
     url = "twitter.com/anyuser/status/" + tweet_id
     message = tweet['text'].replace("\n", "")
-    
+
     time_tweet_creation = tweet['created_at']
-    new_datetime = datetime.strptime(time_tweet_creation,'%a %b %d %H:%M:%S +0000 %Y')
+    new_datetime = datetime.strptime(time_tweet_creation, '%a %b %d %H:%M:%S +0000 %Y')
     current_time = datetime.utcnow()
     diff_time = current_time - new_datetime
     minutessince = int(diff_time.total_seconds() / 60)
-    
+
     user = tweet['user']['screen_name']
     message = str(minutessince) + " mins ago " + user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
     return message
@@ -252,7 +260,7 @@ def add_meme(update: Update, context: CallbackContext):
             try:
                 image = context.bot.getFile(update.message.photo[0])
                 file_id = str(image.file_id)
-                print ("file_id: " + file_id)
+                print("file_id: " + file_id)
                 tmp_path = MEME_GIT_REPO + '/memesFolder/' + file_id + ".png"
                 image.download(tmp_path)
                 hash = calculate_hash(tmp_path)
@@ -274,12 +282,13 @@ def add_meme(update: Update, context: CallbackContext):
         a = 1
 
 
-
 def copy_file_to_git_meme_folder(path, hash_with_extension):
     shutil.copyfile(path, MEME_GIT_REPO + '/memesFolder/' + hash_with_extension)
 
+
 def calculate_hash(path_to_image):
     return str(imagehash.average_hash(Image.open(path_to_image)))
+
 
 def add_file_to_git(filename):
     index = repo.index
@@ -300,6 +309,25 @@ def check_file_already_present(hash):
     return found
 
 
+# graphql queries
+def get_price_simple(update: Update, context: CallbackContext):
+    resp_rot = graphql_client.execute(req_graphql_rot)
+    resp_usdt = graphql_client.execute(req_graphql_usdt)
+
+    json_resp_rot = json.loads(resp_rot)
+    json_resp_usdt = json.loads(resp_usdt)
+
+    eth_per_rot = float(json_resp_rot['data']['token']['derivedETH'])
+    eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
+
+    dollar_per_rot = eth_per_rot / eth_per_usdt
+    rot_per_eth = 1.0 / eth_per_rot
+
+    message = "1$ROT = " + str(dollar_per_rot) + "$\n 1$ETH = " + str(rot_per_eth)
+    chat_id = update.message.chat_id
+    context.bot.send_message(chat_id=chat_id, text=message)
+
+
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
     dp = updater.dispatcher
@@ -313,6 +341,7 @@ def main():
     dp.add_handler(CommandHandler('4biz', get_biz))
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
     dp.add_handler(MessageHandler(Filters.photo, add_meme))
+    dp.add_handler(CommandHandler('rot_price', get_price_simple))
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     updater.start_polling()
     updater.idle()
@@ -332,5 +361,5 @@ supplycap - How ROTTED are we
 4biz - List biz thread
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
+rot_price - Display a (simple) view of the $ROT price
 """
-
