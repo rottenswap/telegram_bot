@@ -64,7 +64,7 @@ def format_tweet(tweet):
     minutessince = int(diff_time.total_seconds() / 60)
 
     user = tweet['user']['screen_name']
-    message = str(minutessince) + " mins ago | " + user + " -- " + "<a href=\"" + url + "\">" + message + "</a> \n"
+    message = str(minutessince) + " mins ago | " + user + " -- " + message.split('https')[0] + "<a href=\"" + url + "\">link</a>\n"
     return message
 
 
