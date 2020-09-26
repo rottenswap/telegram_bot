@@ -342,6 +342,10 @@ def get_price_simple(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
 
+def get_help(update: Update, context: CallbackContext):
+    message = "Technical issue? A question? Need help? Join the guys at @RottenHelp."
+    chat_id = update.message.chat_id
+    context.bot.send_message(chat_id=chat_id, text=message)
 
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
@@ -377,6 +381,7 @@ supplycap - How ROTTED are we
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
+helt - Technical issue? A question? Need help?
 """
 
 
