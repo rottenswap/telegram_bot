@@ -323,7 +323,7 @@ def get_price_simple(update: Update, context: CallbackContext):
     dollar_per_rot = eth_per_rot / eth_per_usdt
     rot_per_eth = 1.0 / eth_per_rot
 
-    message = "1$ROT = " + str(dollar_per_rot) + "$\n 1$ETH = " + str(rot_per_eth)
+    message = "1$ROT = " + str('%.5f' % dollar_per_rot) + "$\n1$ETH = " + str('%.1f' % rot_per_eth)
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
 
