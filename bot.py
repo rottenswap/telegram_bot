@@ -64,7 +64,7 @@ def format_tweet(tweet):
     minutessince = int(diff_time.total_seconds() / 60)
 
     user = tweet['user']['screen_name']
-    message = str(minutessince) + " mins ago " + user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
+    message = str(minutessince) + " mins ago | " + user + " -- " + "<a href=\"" + url + "\">" + message[0:100] + "</a> \n"
     return message
 
 
@@ -340,7 +340,7 @@ def get_price_simple(update: Update, context: CallbackContext):
 
     message = "ETH: Ξ" + str(eth_per_rot)[0:10] \
               + "\nUSD: $" + str(dollar_per_rot)[0:10] \
-              + "\nsupply cat: " + supply_cat_pretty \
+              + "\nsupply cap: " + supply_cat_pretty \
               + "\nmarket cap: $" + market_cap
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
