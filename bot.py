@@ -27,7 +27,7 @@ re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting')
 
 twitter = Twython(APP_KEY, APP_SECRET, ACCESS_TOKEN, ACCESS_SECRET_TOKEN)
 
-how_many_tweets = 3
+how_many_tweets = 5
 
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
