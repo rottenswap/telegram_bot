@@ -371,6 +371,7 @@ if __name__ == '__main__':
     main()
 
 commands = """
+help - Technical issues? A question? Need help?
 rotme - Give me a random meme
 rottedchart - Get the charts of $ROT
 maggotchart - Get the charts of $MAGGOTS
@@ -382,7 +383,6 @@ supplycap - How ROTTED are we
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
-helt - Technical issues? A question? Need help?
 """
 
 
