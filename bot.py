@@ -263,13 +263,12 @@ def get_last_tweets(update: Update, context: CallbackContext):
 ### ADD MEME
 
 def add_meme(update: Update, context: CallbackContext):
-    print("received_image")
-
     try:
         caption = update['message']['caption']
         if caption == "/add_meme":
             try:
                 image = context.bot.getFile(update.message.photo[0])
+                print(update.message.photo[0])
                 file_id = str(image.file_id)
                 print("file_id: " + file_id)
                 tmp_path = MEME_GIT_REPO + '/memesFolder/' + file_id + ".png"
@@ -278,10 +277,10 @@ def add_meme(update: Update, context: CallbackContext):
                 is_present = check_file_already_present(hash)
                 if not is_present:
                     filename = hash + '.jpg'
-                    copy_file_to_git_meme_folder(tmp_path, filename)
-                    add_file_to_git(filename)
+                    #copy_file_to_git_meme_folder(tmp_path, filename)
+                    #add_file_to_git(filename)
                     chat_id = update.message.chat_id
-                    context.bot.send_message(chat_id=chat_id, text="Got it boss!")
+                    context.bot.send_message(chat_id=chat_id, text="Service temporarily unavailable. Try again later.")
                 else:
                     chat_id = update.message.chat_id
                     context.bot.send_message(chat_id=chat_id, text="Image already registered")
