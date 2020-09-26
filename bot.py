@@ -38,6 +38,10 @@ twitter = Twython(APP_KEY, APP_SECRET, ACCESS_TOKEN, ACCESS_SECRET_TOKEN)
 
 how_many_tweets = 5
 
+## CONTRACT
+rot_contract = '0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
+maggot_contract = '0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89'
+
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
 assert not repo.bare
@@ -88,15 +92,22 @@ def how_to_slippage(update: Update, context: CallbackContext):
     context.bot.send_photo(chat_id=chat_id, photo=url)
 
 
+def get_supply_cap_addr(contract_addr):
+    base_addr = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=' + contract_addr + '&apikey=' + etherscan_api_key
+    decimals = 1000000000000000000
+    supply_cap = round(int(requests.post(base_addr).json()['result']) / decimals)
+    return supply_cap
+
+
+# convert int to nice string: 1234567 => 1.234.567
+def number_to_beautiful(nbr):
+    return locale.format_string("%d", nbr, grouping=True)
+
+
 # Get the supply cache from etherscan. Uses the ETH_API_KEY passed as an env variable.
 def get_supply_cap(update: Update, context: CallbackContext):
-    rotAddr = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2&apikey=' + etherscan_api_key
-    maggotAddr = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89&apikey=' + etherscan_api_key
-    decimals = 1000000000000000000
-    request_rot = round(int(requests.post(rotAddr).json()['result']) / decimals)
-    request_maggot = round(int(requests.post(maggotAddr).json()['result']) / decimals)
-    number_rot = locale.format_string("%d", request_rot, grouping=True)
-    number_maggots = locale.format_string("%d", request_maggot, grouping=True)
+    number_rot = number_to_beautiful(get_supply_cap_addr(rot_contract))
+    number_maggots = number_to_beautiful(get_supply_cap_addr(maggot_contract))
     message = "It's <b>ROTTING</b> around here! There are <pre>" + str(number_rot) + "</pre> ROTS and <pre>" + str(
         number_maggots) + "</pre> MAGGOTS"
     chat_id = update.message.chat_id
@@ -323,7 +334,10 @@ def get_price_simple(update: Update, context: CallbackContext):
     dollar_per_rot = eth_per_rot / eth_per_usdt
     rot_per_eth = 1.0 / eth_per_rot
 
-    message = "ETH: Ξ" + str(eth_per_rot)[0:10] + "\nUSD: $" + str(dollar_per_rot)[0:10]
+    supply_cap_rot = get_supply_cap_addr(rot_contract)
+    market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
+
+    message = "ETH: Ξ" + str(eth_per_rot)[0:10] + "\nUSD: $" + str(dollar_per_rot)[0:10] + "\nmarket cap: " + market_cap + '$'
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
 
@@ -363,3 +377,4 @@ twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
 """
+
