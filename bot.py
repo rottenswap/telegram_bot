@@ -269,6 +269,8 @@ def add_meme(update: Update, context: CallbackContext):
             try:
                 image = context.bot.getFile(update.message.photo[0])
                 print(update.message.photo[0])
+                print(update.message.photo)
+                print(update.message.photo[-1])
                 file_id = str(image.file_id)
                 print("file_id: " + file_id)
                 tmp_path = MEME_GIT_REPO + '/memesFolder/' + file_id + ".png"
