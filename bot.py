@@ -361,6 +361,7 @@ def main():
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
     dp.add_handler(MessageHandler(Filters.photo, add_meme))
     dp.add_handler(CommandHandler('rot_price', get_price_simple))
+    dp.add_handler(CommandHandler('help', get_help))
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     updater.start_polling()
     updater.idle()
