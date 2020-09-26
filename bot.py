@@ -229,7 +229,7 @@ def filter_tweets(all_tweets):
 
 
 def get_last_tweets(update: Update, context: CallbackContext):
-    results = query_tweets()
+    results = query_tweets(False)
     message = "<b>Normies are tweeting about ROT, go comment/like/RT:</b>\n"
     rest_message = filter_tweets(results)
     if rest_message == "":
