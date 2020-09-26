@@ -147,14 +147,14 @@ def get_biz(update: Update, context: CallbackContext):
 def chart(update: Update, context: CallbackContext):
     test = "https://app.astrotools.io/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888"
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=test)
+    context.bot.send_message(chat_id=chat_id, text=test, disable_web_page_preview=True)
 
 
 # sends the astrotools chart of the $MAGGOT token
 def chart_maggot(update: Update, context: CallbackContext):
     test = "https://app.astrotools.io/pair-explorer/0x46ba95ff4f4cd9353eadde43bee519fa50886e72"
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=test)
+    context.bot.send_message(chat_id=chat_id, text=test, disable_web_page_preview=True)
 
 
 # uniswap page
