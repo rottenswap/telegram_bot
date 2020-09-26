@@ -245,7 +245,7 @@ def add_meme(update: Update, context: CallbackContext):
                 image = context.bot.getFile(update.message.photo[0])
                 file_id = str(image.file_id)
                 print ("file_id: " + file_id)
-                tmp_path = MEME_GIT_REPO + '/' + file_id + ".png"
+                tmp_path = MEME_GIT_REPO + '/memesFolder/' + file_id + ".png"
                 image.download(tmp_path)
                 hash = calculate_hash(tmp_path)
                 is_present = check_file_already_present(hash)
@@ -268,14 +268,14 @@ def add_meme(update: Update, context: CallbackContext):
 
 
 def copy_file_to_git_meme_folder(path, hash_with_extension):
-    shutil.copyfile(path, MEME_GIT_REPO + '/' + hash_with_extension)
+    shutil.copyfile(path, MEME_GIT_REPO + '/memesFolder/' + hash_with_extension)
 
 def calculate_hash(path_to_image):
     return str(imagehash.average_hash(Image.open(path_to_image)))
 
 def add_file_to_git(filename):
     index = repo.index
-    index.add(MEME_GIT_REPO + "/" + filename)
+    index.add(MEME_GIT_REPO + "/memesFolder/" + filename)
     index.commit("adding dank meme " + filename)
     origin = repo.remote('origin')
     origin.push()
@@ -284,7 +284,7 @@ def add_file_to_git(filename):
 # Returns True if the file is already present in the MEME_GIT_REPO directory
 def check_file_already_present(hash):
     found = False
-    for file in os.listdir(MEME_GIT_REPO):
+    for file in os.listdir(MEME_GIT_REPO + '/memesFolder/'):
         filename = os.fsdecode(file)
         filename_no_extension = filename.split(".")[0]
         if filename_no_extension == hash:
