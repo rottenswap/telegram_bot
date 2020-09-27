@@ -343,7 +343,7 @@ def get_price_simple(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=chat_id, text=message)
 
 def get_help(update: Update, context: CallbackContext):
-    message = "Technical issues? A question? Need help? Join the guys at @rottenhelpgroup."
+    message = "Technical issues? A question? Tired of the FUD? Need help? Join the guys at @rottenhelpgroup."
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
 
