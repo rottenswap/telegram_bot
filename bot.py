@@ -346,6 +346,25 @@ def get_help(update: Update, context: CallbackContext):
     message = "Technical issues? A question? Tired of the FUD? Need help? Join the guys at @rottenhelpgroup."
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
+    
+
+def get_fake_price(update: Update, context: CallbackContext):
+    message = '''
+(ROT) RottenToken
+ETH: Ξ0.01886294
+USD: $6.66000000
+24H:   66%
+7D :  666%
+
+Vol 24H = $6 666 666
+1 ETH   = 53 ROT
+Holders = 6666
+Con.Adr = 0xd04...9e2
+@allUniSwapListings
+    '''
+    chat_id = update.message.chat_id
+    context.bot.send_message(chat_id=chat_id, text=message)
+    
 
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
@@ -362,6 +381,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.photo, add_meme))
     dp.add_handler(CommandHandler('rot_price', get_price_simple))
     dp.add_handler(CommandHandler('help', get_help))
+    dp.add_handler(CommandHandler('fake_price', get_fake_price))
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     updater.start_polling()
     updater.idle()
