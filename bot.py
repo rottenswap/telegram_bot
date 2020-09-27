@@ -340,7 +340,7 @@ def get_price_simple(update: Update, context: CallbackContext):
               + "\nsupply cap: " + supply_cat_pretty \
               + "\nmarket cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=message)
+    context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
 def get_help(update: Update, context: CallbackContext):
     message = "Technical issues? A question? Tired of the FUD? Need help? Join the guys at @rottenhelpgroup."
