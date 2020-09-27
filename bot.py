@@ -350,6 +350,7 @@ def get_help(update: Update, context: CallbackContext):
 
 def get_fake_price(update: Update, context: CallbackContext):
     message = '''<pre>
+FOR LEGAL REASONS THAT'S FAKE PRICE
 (ROT) RottenToken
 ETH: Ξ0.01886294
 USD: $6.66000000
