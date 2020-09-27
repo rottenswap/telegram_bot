@@ -349,7 +349,7 @@ def get_help(update: Update, context: CallbackContext):
     
 
 def get_fake_price(update: Update, context: CallbackContext):
-    message = '''
+    message = '''<pre>
 (ROT) RottenToken
 ETH: Ξ0.01886294
 USD: $6.66000000
@@ -360,10 +360,9 @@ Vol 24H = $6 666 666
 1 ETH   = 53 ROT
 Holders = 6666
 Con.Adr = 0xd04...9e2
-@allUniSwapListings
-    '''
+@allUniSwapListings</pre>'''
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=message)
+    context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
     
 
 def main():
