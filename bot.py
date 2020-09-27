@@ -55,7 +55,8 @@ assert not repo.is_dirty()  # check the dirty state
 def format_tweet(tweet):
     tweet_id = tweet['id_str']
     url = "twitter.com/anyuser/status/" + tweet_id
-    message = tweet['text'].replace("\n", "")
+    message = tweet['text'].replace("\n", "").split('https')[0].replace('$', '').replace('@', '')
+    print("message")
 
     time_tweet_creation = tweet['created_at']
     new_datetime = datetime.strptime(time_tweet_creation, '%a %b %d %H:%M:%S +0000 %Y')
@@ -64,8 +65,8 @@ def format_tweet(tweet):
     minutessince = int(diff_time.total_seconds() / 60)
 
     user = tweet['user']['screen_name']
-    message = "<a href=\"" + url + "\><b>" + str(minutessince) + " mins ago</b></a> | " + user + " -- " + message.split('https')[0].replace('$', '').replace('@', '') + "\n"
-    return message
+    message_final = "<a href=\"" + url + "\><b>" + str(minutessince) + " mins ago</b></a> | " + user + " -- " + message + "\n"
+    return message_final
 
 
 # scraps the github project to get those sweet memes. Will chose one randomly and send it.
