@@ -55,7 +55,7 @@ assert not repo.is_dirty()  # check the dirty state
 def format_tweet(tweet):
     tweet_id = tweet['id_str']
     url = "twitter.com/anyuser/status/" + tweet_id
-    message = tweet['text'].replace("\n", "").split('https')[0].replace('$', '').replace('@', '')
+    message = tweet['text'].replace("\n", "").split('https')[0].replace('#', '').replace('@', '')
     print(message)
 
     time_tweet_creation = tweet['created_at']
@@ -65,7 +65,7 @@ def format_tweet(tweet):
     minutessince = int(diff_time.total_seconds() / 60)
 
     user = tweet['user']['screen_name']
-    message_final = "<a href=\"" + url + "\"><b>" + str(minutessince) + " mins ago</b></a> | " + user + " -- " + message + "\n"
+    message_final = "<a href=\"" + url + "\"><b>" + str(minutessince) + " mins ago</b> | " + user + "</a> -- " + message + "\n"
     print(message_final)
     return message_final
 
