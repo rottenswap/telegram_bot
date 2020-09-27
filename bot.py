@@ -335,10 +335,10 @@ def get_price_simple(update: Update, context: CallbackContext):
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
 
-    message = "ETH: Ξ" + str(eth_per_rot)[0:10] \
+    message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
               + "\nUSD: $" + str(dollar_per_rot)[0:10] \
               + "\nsupply cap: " + supply_cat_pretty \
-              + "\nmarket cap: $" + market_cap
+              + "\nmarket cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
 
@@ -349,8 +349,7 @@ def get_help(update: Update, context: CallbackContext):
     
 
 def get_fake_price(update: Update, context: CallbackContext):
-    message = '''<pre>
-FOR LEGAL REASONS THAT'S FAKE PRICE
+    message = '''<pre>FOR LEGAL REASONS THAT'S FAKE PRICE
 (ROT) RottenToken
 ETH: Ξ0.01886294
 USD: $6.66000000
