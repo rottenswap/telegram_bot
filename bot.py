@@ -371,7 +371,7 @@ if __name__ == '__main__':
     main()
 
 commands = """
-help - Technical issues? A question? Need help?
+help - Technical issues? A question? Tired of the FUD? Need help?
 rotme - Give me a random meme
 rottedchart - Get the charts of $ROT
 maggotchart - Get the charts of $MAGGOTS
