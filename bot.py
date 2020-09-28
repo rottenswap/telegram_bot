@@ -352,7 +352,7 @@ def get_price_simple(update: Update, context: CallbackContext):
 
 
 def get_help(update: Update, context: CallbackContext):
-    message = "Technical issues? A question? Tired of the FUD? Need help? Join the guys at @rottenhelpgroup."
+    message = "Technical issues? A question? Need help? Join the guys at @rottenhelpgroup."
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
 
@@ -388,22 +388,11 @@ def check_new_proposal(update: Update, context: CallbackContext):
                 last_proposal_received_id = id_last_proposal
                 proposal_title = last_proposal['title']
                 description = last_proposal['description']
-                message = 'New proposal added: \n<b>' + proposal_title + '</b>:\n' \
-                          + description + '\nGo vote at' \
+                message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
+                          + description + '\nGo vote at ' \
                           + telegram_governance_url
                 print("should send proposal values")
                 context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
-
-
-def check_new_proposal_callback(update: Update, context: CallbackContext):
-    #job = context.job
-    #print("job: " + job)
-    print("here I am")
-    # print("CHAT ID:" + str(update.message.chat_id))
-    # context.bot.send_message(chat_id=update.message.chat_id, text='gotcha')
-    if last_proposal_received_id == 1:
-        print("there I go")
-        check_new_proposal(update, context)
 
 
 def main():
@@ -422,8 +411,8 @@ def main():
     dp.add_handler(CommandHandler('rot_price', get_price_simple))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
-    updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
-    dp.add_handler(MessageHandler(Filters.text, check_new_proposal_callback, pass_job_queue=True))
+    dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
+    dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
 
     updater.start_polling()
     updater.idle()
@@ -433,7 +422,7 @@ if __name__ == '__main__':
     main()
 
 commands = """
-help - Technical issues? A question? Tired of the FUD? Need help?
+help - Technical issues? A question? Need help?
 rotme - Give me a random meme
 rottedchart - Get the charts of $ROT
 maggotchart - Get the charts of $MAGGOTS
