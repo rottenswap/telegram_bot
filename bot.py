@@ -34,7 +34,7 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 
 # API PROPOSAL
 api_proposal_url = 'https://rotapi.xyz/governance/getProposals'
-last_proposal_received_id = 1  # TODO: change back to -1
+last_proposal_received_id = -1
 telegram_governance_url = 't.me/rottengovernance'
 rotten_main_chat_id = -1001382715556
 
@@ -57,7 +57,7 @@ with repo.config_writer():  # get a config writer to change configuration
 assert not repo.is_dirty()  # check the dirty state
 
 
-## UTIL
+# UTIL
 def format_tweet(tweet):
     tweet_id = tweet['id_str']
     url = "twitter.com/anyuser/status/" + tweet_id
@@ -376,7 +376,6 @@ Con.Adr = 0xd04...9e2
 
 def check_new_proposal(update: Update, context: CallbackContext):
     global last_proposal_received_id
-    print("you called me?")
     response_json = requests.get(api_proposal_url).json()
     if response_json != "" or response_json is not None:
         last_proposal = response_json[-1]
@@ -391,7 +390,7 @@ def check_new_proposal(update: Update, context: CallbackContext):
                 message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
                           + description + '\nGo vote at ' \
                           + telegram_governance_url
-                print("should send proposal values")
+                print("new proposal found and sent")
                 context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
 
 
