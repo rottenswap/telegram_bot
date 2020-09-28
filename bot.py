@@ -395,13 +395,13 @@ def check_new_proposal(update: Update, context: CallbackContext):
 
 
 def check_new_proposal_callback(update: Update, context: CallbackContext):
-    job = context.job
-    print("job: " + job)
+    #job = context.job
+    #print("job: " + job)
     print("here I am")
     # print("CHAT ID:" + str(update.message.chat_id))
     # context.bot.send_message(chat_id=update.message.chat_id, text='gotcha')
     if last_proposal_received_id == 1:
-        job.run_repeating(check_new_proposal, 20, context=update.message.chat_id)
+        check_new_proposal
 
 
 def main():
