@@ -452,7 +452,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
     price = [float(value[1]) for value in list_time_price]
 
     dates = matplotlib.dates.date2num(dates_pure)
-
+    CB91_Green = '#47DBCD'
     plt.style.use('dark_background')
     f = plt.figure()
     ax = f.add_subplot(111)
@@ -460,7 +460,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
     ax.yaxis.tick_right()
     ax.yaxis.set_label_position("right")
 
-    plt.plot_date(dates, price, 'g-o')
+    plt.plot_date(dates, price, CB91_Green)
     plt.gcf().autofmt_xdate()
     plt.savefig(chart_file_path, bbox_inches='tight')
     caption = "current price: " + str(price[-1])
