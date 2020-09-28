@@ -348,6 +348,7 @@ def delete_meme(update: Update, context: CallbackContext):
                 index.commit("adding dank meme " + filename)
                 origin = repo.remote('origin')
                 origin.push()
+                print("deleting meme " + to_delete)
                 chat_id = update.message.chat_id
                 context.bot.send_message(chat_id=chat_id, text="removed" + filename)
 
