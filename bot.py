@@ -439,6 +439,21 @@ def keep_dates(list):
     return dates_datetime
 
 
+def print_chart(dates_raw, price):
+    dates = matplotlib.dates.date2num(dates_raw)
+    cb91_green = '#47DBCD'
+    plt.style.use('dark_background')
+    f = plt.figure()
+    ax = f.add_subplot(111)
+    ax.yaxis.set_major_formatter('${x:1.3f}')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_label_position("right")
+
+    plt.plot_date(dates, price, cb91_green)
+    plt.gcf().autofmt_xdate()
+    plt.savefig(chart_file_path, bbox_inches='tight')
+
+
 def get_chart_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     list_time_price = []
@@ -454,23 +469,13 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
 
         price = [float(value[1]) for value in list_time_price]
 
-        dates = matplotlib.dates.date2num(dates_pure)
-        cb91_green = '#47DBCD'
-        plt.style.use('dark_background')
-        f = plt.figure()
-        ax = f.add_subplot(111)
-        ax.yaxis.set_major_formatter('${x:1.3f}')
-        ax.yaxis.tick_right()
-        ax.yaxis.set_label_position("right")
-
-        plt.plot_date(dates, price, cb91_green)
-        plt.gcf().autofmt_xdate()
-        plt.savefig(chart_file_path, bbox_inches='tight')
+        print_chart(dates_pure, price)
         caption = "current price: " + str(price[-1])
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
-        context.bot.send_message(chat_id=chat_id, text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range)")
+        context.bot.send_message(chat_id=chat_id,
+                                 text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range)")
     else:
         time_type = query_received[2]
         time_start = int(query_received[1])
@@ -480,26 +485,14 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
         if time_type == 'd' or time_type == 'D':
             multiplier = 1440
 
-        start_range = int(time_start*multiplier)
-
+        start_range = int(time_start * multiplier)
         filtered_values = list_time_price[-start_range: -1]
 
         dates_pure = keep_dates(filtered_values)
-
         price = [float(value[1]) for value in filtered_values]
 
-        dates = matplotlib.dates.date2num(dates_pure)
-        cb91_green = '#47DBCD'
-        plt.style.use('dark_background')
-        f = plt.figure()
-        ax = f.add_subplot(111)
-        ax.yaxis.set_major_formatter('${x:1.3f}')
-        ax.yaxis.tick_right()
-        ax.yaxis.set_label_position("right")
+        print_chart(dates_pure, price)
 
-        plt.plot_date(dates, price, cb91_green)
-        plt.gcf().autofmt_xdate()
-        plt.savefig(chart_file_path, bbox_inches='tight')
         caption = "current price: " + str(price[-1])
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
