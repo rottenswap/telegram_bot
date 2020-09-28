@@ -493,7 +493,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
         price = [float(value[1]) for value in list_time_price]
 
         print_chart(dates_pure, price)
-        caption = "Chart since the bot starting logging the price\nCurrent price: " + str(price[-1])[0:10]
+        caption = "Chart since the bot starting logging the price.\nCurrent price: " + str(price[-1])[0:10]
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
