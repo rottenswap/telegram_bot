@@ -456,7 +456,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
     plt.style.use('dark_background')
     f = plt.figure()
     ax = f.add_subplot(111)
-    plt.ylabel('$/rot')
+    ax.yaxis.set_major_formatter('${x:1.3f}')
     ax.yaxis.tick_right()
     ax.yaxis.set_label_position("right")
 
