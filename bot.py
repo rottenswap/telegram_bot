@@ -513,5 +513,5 @@ twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
 governance - Get the governance channel
-getChart - Display a (simple) price chart
+getchart - Display a (simple) price chart
 """
