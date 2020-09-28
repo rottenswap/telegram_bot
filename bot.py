@@ -453,6 +453,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
 
     dates = matplotlib.dates.date2num(dates_pure)
 
+    plt.style.use('dark_background')
     f = plt.figure()
     ax = f.add_subplot(111)
     plt.ylabel('$/rot')
