@@ -466,6 +466,11 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
     context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'))
 
 
+def get_governance_channel(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    context.bot.send_message(chat_id=chat_id, text=telegram_governance_url)
+
+
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
     dp = updater.dispatcher
@@ -482,7 +487,8 @@ def main():
     dp.add_handler(CommandHandler('rot_price', get_price_simple))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
-    dp.add_handler(CommandHandler('get_chart', get_chart_pyplot))
+    dp.add_handler(CommandHandler('getChart', get_chart_pyplot))
+    dp.add_handler(CommandHandler('governance', get_governance_channel))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
 
@@ -506,4 +512,6 @@ supplycap - How ROTTED are we
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
+governance - Get the governance channel
+getChart - Display a (simple) price chart
 """
