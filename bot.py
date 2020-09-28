@@ -540,6 +540,7 @@ def main():
     dp.add_handler(CommandHandler('getChart', get_chart_pyplot))
     dp.add_handler(CommandHandler('governance', get_governance_channel))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
+    dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
 
     updater.start_polling()
