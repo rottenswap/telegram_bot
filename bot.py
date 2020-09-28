@@ -412,7 +412,7 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
 
     job = updater.job_queue
-    job.run_repeating(check_new_proposal, 20, context=rotten_main_chat_id)
+    job.run_repeating(check_new_proposal, 20)
 
     updater.start_polling()
     updater.idle()
