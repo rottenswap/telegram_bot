@@ -462,8 +462,9 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
     plt.plot_date(dates, price, 'g-o')
     plt.gcf().autofmt_xdate()
     plt.savefig(chart_file_path, bbox_inches='tight')
+    caption = "current price: " + str(price[-1])
     chat_id = update.message.chat_id
-    context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'))
+    context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
 
 
 def get_governance_channel(update: Update, context: CallbackContext):
