@@ -345,7 +345,7 @@ def delete_meme(update: Update, context: CallbackContext):
             to_delete = query_received[2]
             if check_file_already_present(to_delete):
                 print("meme found")
-                filename = to_delete + 'png'
+                filename = to_delete + '.png'
                 index = repo.index
                 index.remove(MEME_GIT_REPO + "/memesFolder/" + filename)
                 index.commit("adding dank meme " + filename)
