@@ -524,7 +524,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
 def get_governance_channel(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     response_json = requests.get(api_proposal_url).json()
-    values = response_json[-6, -1]
+    values = response_json[-6:-1]
     titles = ""
     for value in values:
         titles = titles + value['title'] + '\n'
