@@ -528,7 +528,7 @@ def get_governance_channel(update: Update, context: CallbackContext):
     titles = ""
     for value in values:
         titles = titles + value['title'] + '\n'
-    message = telegram_governance_url + '\nLast 5 proposals:\n' 
+    message = telegram_governance_url + '\nLast 5 proposals:\n' + titles
     context.bot.send_message(chat_id=chat_id, text=message)
 
 
