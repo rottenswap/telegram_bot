@@ -324,14 +324,32 @@ def add_file_to_git(filename):
 
 
 # Returns True if the file is already present in the MEME_GIT_REPO directory
-def check_file_already_present(hash):
+def check_file_already_present(meme_hash):
     found = False
     for file in os.listdir(MEME_GIT_REPO + '/memesFolder/'):
         filename = os.fsdecode(file)
         filename_no_extension = filename.split(".")[0]
-        if filename_no_extension == hash:
+        if filename_no_extension == meme_hash:
             found = True
     return found
+
+
+# REMOVE MEME
+def delete_meme(update: Update, context: CallbackContext):
+    query_received = update.message.text.split(' ')
+    if len(query_received) == 2:
+        password = query_received[1]
+        if password == "adbe5443-3bed-4230-a2e7-a94c8a8401ef"
+            to_delete = query_received[2]
+            if check_file_already_present(to_delete):
+                filename = to_delete + 'png'
+                index = repo.index
+                index.remove(MEME_GIT_REPO + "/memesFolder/" + filename)
+                index.commit("adding dank meme " + filename)
+                origin = repo.remote('origin')
+                origin.push()
+                chat_id = update.message.chat_id
+                context.bot.send_message(chat_id=chat_id, text="removed" + filename)
 
 
 # graphql queries
@@ -427,9 +445,9 @@ def check_new_proposal(update: Update, context: CallbackContext):
 
 
 # util for get_chart_pyplot
-def keep_dates(list):
+def keep_dates(values_list):
     dates_str = []
-    for values in list:
+    for values in values_list:
         dates_str.append(values[0])
 
     dates_datetime = []
