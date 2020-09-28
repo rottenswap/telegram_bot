@@ -523,7 +523,13 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
 
 def get_governance_channel(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=telegram_governance_url)
+    response_json = requests.get(api_proposal_url).json()
+    values = response_json[-6, -1]
+    titles = ""
+    for value in values:
+        titles = titles + value['title'] + '\n'
+    message = telegram_governance_url
+    context.bot.send_message(chat_id=chat_id, text=message)
 
 
 def main():
