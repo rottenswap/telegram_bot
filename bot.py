@@ -475,6 +475,7 @@ def print_chart(dates_raw, price):
     plt.plot_date(dates, price, cb91_green)
     plt.gcf().autofmt_xdate()
     plt.savefig(chart_file_path, bbox_inches='tight')
+    plt.close(f)
 
 
 def get_chart_pyplot(update: Update, context: CallbackContext):
