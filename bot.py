@@ -400,7 +400,7 @@ def check_new_proposal_callback(update: Update, context: CallbackContext):
     # print("CHAT ID:" + str(update.message.chat_id))
     # context.bot.send_message(chat_id=update.message.chat_id, text='gotcha')
     if last_proposal_received_id == 1:
-        job.run_repeating(check_new_proposal, 20)
+        job.run_repeating(check_new_proposal, 20, context=update.message.chat_id)
 
 
 def main():
