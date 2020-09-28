@@ -412,7 +412,7 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
 
     job = updater.job_queue
-    job.run_repeating(check_new_proposal, 20)
+    job.run_repeating(check_new_proposal, 20, context=telegram_governance_url)
 
     updater.start_polling()
     updater.idle()
