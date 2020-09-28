@@ -29,6 +29,7 @@ TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
 req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
 req_graphql_usdt = '''{token(id: "0xdac17f958d2ee523a2206206994597c13d831ec7") {derivedETH}}'''
 graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+price_file_path = '/home/debian/rot/log_files/price_hist.txt'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
@@ -340,6 +341,8 @@ def get_price_simple(update: Update, context: CallbackContext):
     dollar_per_rot = eth_per_rot / eth_per_usdt
     rot_per_eth = 1.0 / eth_per_rot
 
+    add_to_file(dollar_per_rot)
+
     supply_cap_rot = get_supply_cap_addr(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
@@ -350,6 +353,15 @@ def get_price_simple(update: Update, context: CallbackContext):
               + "\nmarket cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
+
+
+def add_to_file(dollar_per_rot):
+    global price_file_path
+    with open(price_file_path, "a") as price_file:
+        time_now = datetime.now()
+        date_time_str = time_now.strftime("%m/%d/%Y, %H:%M:%S")
+        message_to_write = "\n" + date_time_str + dollar_per_rot
+        price_file.write(message_to_write)
 
 
 def get_help(update: Update, context: CallbackContext):
