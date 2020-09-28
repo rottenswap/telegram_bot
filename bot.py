@@ -447,6 +447,8 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
         for row in spamreader:
             list_time_price.append((row[0], row[1]))
 
+    print(str(update.message.text))
+
     dates_pure = keep_dates(list_time_price)
 
     price = [float(value[1]) for value in list_time_price]
