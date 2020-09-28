@@ -380,7 +380,7 @@ def check_new_proposal(update: Update, context: CallbackContext):
     global last_time_checked
     new_time = round(time.time())
     if new_time - last_time_checked > 60:
-        print("Checking for new proposal...")
+        print("Checking for new proposals...")
         last_time_checked = new_time
         response_json = requests.get(api_proposal_url).json()
         if response_json != "" or response_json is not None:
@@ -396,7 +396,7 @@ def check_new_proposal(update: Update, context: CallbackContext):
                     message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
                               + description + '\nGo vote at ' \
                               + telegram_governance_url
-                    print("new proposal found and sent")
+                    print("New proposal found and sent")
                     context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
 
 
