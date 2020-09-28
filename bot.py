@@ -378,11 +378,10 @@ def check_new_proposal(update: Update, context: CallbackContext):
     global last_proposal_received_id
     print("you called me?")
     response_json = requests.get(api_proposal_url).json()
-    print("response_json = " + str(response_json))
     if response_json != "" or response_json is not None:
         last_proposal = response_json[-1]
         id_last_proposal = last_proposal['id']
-        if last_proposal_received_id != -1:  # check if the bot just initialized
+        if last_proposal_received_id == -1:  # check if the bot just initialized
             last_proposal_received_id = id_last_proposal
         else:
             if id_last_proposal > last_proposal_received_id:
