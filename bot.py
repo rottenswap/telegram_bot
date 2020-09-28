@@ -34,7 +34,7 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 
 # API PROPOSAL
 api_proposal_url = 'https://rotapi.xyz/governance/getProposals'
-last_proposal_received_id = 1 # TODO: change back to -1
+last_proposal_received_id = 1  # TODO: change back to -1
 telegram_governance_url = 't.me/rottengovernance'
 rotten_main_chat_id = -1001382715556
 
@@ -384,6 +384,7 @@ def check_new_proposal(update: Update, context: CallbackContext):
             last_proposal_received_id = id_last_proposal
         else:
             if id_last_proposal > last_proposal_received_id:
+                last_proposal_received_id = id_last_proposal
                 proposal_title = last_proposal['title']
                 description = last_proposal['description']
                 message = 'New proposal added: \n<b>' + proposal_title + '</b>:\n' \
@@ -391,6 +392,15 @@ def check_new_proposal(update: Update, context: CallbackContext):
                           + telegram_governance_url
                 print("should send proposal values")
                 context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
+
+
+def check_new_proposal_callback(update: Update, context: CallbackContext):
+    job = context.job
+    print("here I am")
+    # print("CHAT ID:" + str(update.message.chat_id))
+    # context.bot.send_message(chat_id=update.message.chat_id, text='gotcha')
+    if last_proposal_received_id == 1:
+        job.run_repeating(check_new_proposal, 20)
 
 
 def main():
@@ -410,9 +420,7 @@ def main():
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
-
-    job = updater.job_queue
-    job.run_repeating(check_new_proposal, 20)
+    dp.add_handler(MessageHandler(Filters.text, check_new_proposal_callback, pass_job_queue=True))
 
     updater.start_polling()
     updater.idle()
