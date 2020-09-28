@@ -101,7 +101,7 @@ def how_to_slippage(update: Update, context: CallbackContext):
     context.bot.send_photo(chat_id=chat_id, photo=url)
 
 
-def get_supply_cap_addr(contract_addr):
+def get_supply_cap_raw(contract_addr):
     base_addr = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=' + contract_addr + '&apikey=' + etherscan_api_key
     decimals = 1000000000000000000
     supply_cap = round(int(requests.post(base_addr).json()['result']) / decimals)
@@ -115,8 +115,8 @@ def number_to_beautiful(nbr):
 
 # Get the supply cache from etherscan. Uses the ETH_API_KEY passed as an env variable.
 def get_supply_cap(update: Update, context: CallbackContext):
-    number_rot = number_to_beautiful(get_supply_cap_addr(rot_contract))
-    number_maggots = number_to_beautiful(get_supply_cap_addr(maggot_contract))
+    number_rot = number_to_beautiful(get_supply_cap_raw(rot_contract))
+    number_maggots = number_to_beautiful(get_supply_cap_raw(maggot_contract))
     message = "It's <b>ROTTING</b> around here! There are <pre>" + str(number_rot) + "</pre> ROTS and <pre>" + str(
         number_maggots) + "</pre> MAGGOTS"
     chat_id = update.message.chat_id
@@ -328,7 +328,8 @@ def check_file_already_present(hash):
 
 
 # graphql queries
-def get_price_simple(update: Update, context: CallbackContext):
+
+def get_price_raw():
     resp_rot = graphql_client.execute(req_graphql_rot)
     resp_usdt = graphql_client.execute(req_graphql_usdt)
 
@@ -339,11 +340,28 @@ def get_price_simple(update: Update, context: CallbackContext):
     eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
 
     dollar_per_rot = eth_per_rot / eth_per_usdt
-    rot_per_eth = 1.0 / eth_per_rot
+    # rot_per_eth = 1.0 / eth_per_rot
+    return (eth_per_rot, dollar_per_rot)
 
-    add_to_file(dollar_per_rot)
 
-    supply_cap_rot = get_supply_cap_addr(rot_contract)
+def get_price_simple(update: Update, context: CallbackContext):
+    # resp_rot = graphql_client.execute(req_graphql_rot)
+    # resp_usdt = graphql_client.execute(req_graphql_usdt)
+    #
+    # json_resp_rot = json.loads(resp_rot)
+    # json_resp_usdt = json.loads(resp_usdt)
+    #
+    # eth_per_rot = float(json_resp_rot['data']['token']['derivedETH'])
+    # eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
+    #
+    # dollar_per_rot = eth_per_rot / eth_per_usdt
+    # rot_per_eth = 1.0 / eth_per_rot
+
+    (eth_per_rot, dollar_per_rot) = get_price_raw()
+
+    #log_current_price_rot_per_usd(dollar_per_rot)
+
+    supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
 
@@ -355,8 +373,9 @@ def get_price_simple(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
 
-def add_to_file(dollar_per_rot):
+def log_current_price_rot_per_usd():
     global price_file_path
+    (eth_per_rot, dollar_per_rot) = get_price_raw()
     with open(price_file_path, "a") as price_file:
         time_now = datetime.now()
         date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
@@ -392,7 +411,9 @@ def check_new_proposal(update: Update, context: CallbackContext):
     global last_time_checked
     new_time = round(time.time())
     if new_time - last_time_checked > 60:
+        
         print("Checking for new proposals...")
+        log_current_price_rot_per_usd()
         last_time_checked = new_time
         response_json = requests.get(api_proposal_url).json()
         if response_json != "" or response_json is not None:
