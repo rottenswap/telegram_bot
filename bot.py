@@ -376,7 +376,9 @@ Con.Adr = 0xd04...9e2
 
 def check_new_proposal(update: Update, context: CallbackContext):
     global last_proposal_received_id
+    print("you called me?")
     response_json = requests.get(api_proposal_url).json()
+    print("response_json = " + response_json)
     if response_json != "" or response_json is not None:
         last_proposal = response_json[-1]
         id_last_proposal = last_proposal['id']
@@ -401,6 +403,7 @@ def check_new_proposal_callback(update: Update, context: CallbackContext):
     # print("CHAT ID:" + str(update.message.chat_id))
     # context.bot.send_message(chat_id=update.message.chat_id, text='gotcha')
     if last_proposal_received_id == 1:
+        print("there I go")
         check_new_proposal(update, context)
 
 
