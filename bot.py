@@ -37,6 +37,7 @@ api_proposal_url = 'https://rotapi.xyz/governance/getProposals'
 last_proposal_received_id = -1
 telegram_governance_url = 't.me/rottengovernance'
 rotten_main_chat_id = -1001382715556
+last_time_checked = round(time.time())
 
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting')
 
@@ -376,22 +377,27 @@ Con.Adr = 0xd04...9e2
 
 def check_new_proposal(update: Update, context: CallbackContext):
     global last_proposal_received_id
-    response_json = requests.get(api_proposal_url).json()
-    if response_json != "" or response_json is not None:
-        last_proposal = response_json[-1]
-        id_last_proposal = last_proposal['id']
-        if last_proposal_received_id == -1:  # check if the bot just initialized
-            last_proposal_received_id = id_last_proposal
-        else:
-            if id_last_proposal > last_proposal_received_id:
+    global last_time_checked
+    new_time = round(time.time())
+    if new_time - last_time_checked > 60:
+        print("Checking for new proposal...")
+        last_time_checked = new_time
+        response_json = requests.get(api_proposal_url).json()
+        if response_json != "" or response_json is not None:
+            last_proposal = response_json[-1]
+            id_last_proposal = last_proposal['id']
+            if last_proposal_received_id == -1:  # check if the bot just initialized
                 last_proposal_received_id = id_last_proposal
-                proposal_title = last_proposal['title']
-                description = last_proposal['description']
-                message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
-                          + description + '\nGo vote at ' \
-                          + telegram_governance_url
-                print("new proposal found and sent")
-                context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
+            else:
+                if id_last_proposal > last_proposal_received_id:
+                    last_proposal_received_id = id_last_proposal
+                    proposal_title = last_proposal['title']
+                    description = last_proposal['description']
+                    message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
+                              + description + '\nGo vote at ' \
+                              + telegram_governance_url
+                    print("new proposal found and sent")
+                    context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
 
 
 def main():
