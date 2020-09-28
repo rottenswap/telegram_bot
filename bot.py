@@ -32,6 +32,11 @@ graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
+# API PROPOSAL
+api_proposal_url = 'https://rotapi.xyz/governance/getProposals'
+last_proposal_received_id = 1 # TODO: change back to -1
+telegram_governance_url = 't.me/rottengovernance'
+
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting')
 
 twitter = Twython(APP_KEY, APP_SECRET, ACCESS_TOKEN, ACCESS_SECRET_TOKEN)
@@ -64,7 +69,8 @@ def format_tweet(tweet):
     minutessince = int(diff_time.total_seconds() / 60)
 
     user = tweet['user']['screen_name']
-    message_final = "<a href=\"" + url + "\"><b>" + str(minutessince) + " mins ago</b> | " + user + "</a> -- " + message + "\n"
+    message_final = "<a href=\"" + url + "\"><b>" + str(
+        minutessince) + " mins ago</b> | " + user + "</a> -- " + message + "\n"
     return message_final
 
 
@@ -223,6 +229,7 @@ def callback_4chan_thread(update: Update, context: CallbackContext):
 
 def callback_timer(update: Update, context: CallbackContext):
     job = context.job
+    print("CHAT ID:" + str(update.message.chat_id))
     context.bot.send_message(chat_id=update.message.chat_id, text='gotcha')
     job.run_repeating(callback_4chan_thread, 900, context=update.message.chat_id)
 
@@ -342,11 +349,12 @@ def get_price_simple(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
+
 def get_help(update: Update, context: CallbackContext):
     message = "Technical issues? A question? Tired of the FUD? Need help? Join the guys at @rottenhelpgroup."
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message)
-    
+
 
 def get_fake_price(update: Update, context: CallbackContext):
     message = '''<pre>FOR LEGAL REASONS THAT'S FAKE PRICE
@@ -363,7 +371,25 @@ Con.Adr = 0xd04...9e2
 @allUniSwapListings</pre>'''
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
-    
+
+
+def check_new_proposal(update: Update, context: CallbackContext):
+    global last_proposal_received_id
+    response_json = requests.get(api_proposal_url).json()
+    if response_json != "" or response_json is not None:
+        last_proposal = response_json[-1]
+        id_last_proposal = last_proposal['id']
+        if last_proposal_received_id != -1:  # check if the bot just initialized
+            last_proposal_received_id = id_last_proposal
+        else:
+            if id_last_proposal > last_proposal_received_id:
+                proposal_title = last_proposal['title']
+                description = last_proposal['description']
+                message = 'New proposal added: \n<b>' + proposal_title + '</b>:\n' \
+                          + description + '\nGo vote at' \
+                          + telegram_governance_url
+                print("should be sent: " + message)
+
 
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
@@ -382,6 +408,10 @@ def main():
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     updater.dispatcher.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
+
+    job = updater.job_queue
+    job.run_repeating(check_new_proposal, 60)
+
     updater.start_polling()
     updater.idle()
 
@@ -403,5 +433,3 @@ twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
 """
-
-
