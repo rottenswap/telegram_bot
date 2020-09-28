@@ -337,7 +337,7 @@ def check_file_already_present(meme_hash):
 # REMOVE MEME
 def delete_meme(update: Update, context: CallbackContext):
     query_received = update.message.text.split(' ')
-    if len(query_received) == 2:
+    if len(query_received) == 3:
         print("someone wants to delete a meme")
         password = query_received[1]
         if password == "adbe5443-3bed-4230-a2e7-a94c8a8401ef":
