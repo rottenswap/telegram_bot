@@ -448,8 +448,8 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
         for row in spamreader:
             list_time_price.append((row[0], row[1]))
 
-    time = update.message.text.split(' ')
-    if len(time) == 1:
+    query_received = update.message.text.split(' ')
+    if len(query_received) == 1:
         dates_pure = keep_dates(list_time_price)
 
         price = [float(value[1]) for value in list_time_price]
@@ -469,11 +469,11 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
         caption = "current price: " + str(price[-1])
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
-    elif len(time) > 3 or len(time) == 2:
+    elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id, text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range)")
     else:
-        time_type = time(2)
-        time_start = int(time(1))
+        time_type = query_received[2]
+        time_start = int(query_received[1])
         multiplier = 1
         if time_type == 'h' or time_type == 'H':
             multiplier = 60
