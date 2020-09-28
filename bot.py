@@ -464,7 +464,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
     plt.gcf().autofmt_xdate()
     plt.savefig(chart_file_path)
     chat_id = update.message.chat_id
-    context.bot.send_photo(chat_id=chat_id, photo=chart_file_path)
+    context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path,'rb'))
 
 
 def main():
