@@ -446,7 +446,6 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
         spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for row in spamreader:
             list_time_price.append((row[0], row[1]))
-        print(list_time_price)
 
     dates_pure = keep_dates(list_time_price)
 
@@ -464,7 +463,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
     plt.gcf().autofmt_xdate()
     plt.savefig(chart_file_path)
     chat_id = update.message.chat_id
-    context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path,'rb'))
+    context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'))
 
 
 def main():
