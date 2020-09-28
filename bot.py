@@ -359,8 +359,8 @@ def add_to_file(dollar_per_rot):
     global price_file_path
     with open(price_file_path, "a") as price_file:
         time_now = datetime.now()
-        date_time_str = time_now.strftime("%m/%d/%Y, %H:%M:%S")
-        message_to_write = "\n" + date_time_str + str(dollar_per_rot)
+        date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
+        message_to_write = date_time_str + " " +  str(dollar_per_rot)
         price_file.write(message_to_write)
 
 
