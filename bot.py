@@ -6,6 +6,10 @@ from graphqlclient import GraphQLClient
 from PIL import Image
 from git import Repo
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import matplotlib.dates
+import matplotlib.pyplot
+import csv
 import requests
 import imagehash
 import shutil
@@ -29,7 +33,10 @@ TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
 req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
 req_graphql_usdt = '''{token(id: "0xdac17f958d2ee523a2206206994597c13d831ec7") {derivedETH}}'''
 graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+
+# log_file
 price_file_path = '/home/debian/rot/log_files/price_hist.txt'
+chart_file_path = '/home/debian/rot/log_files/chart.png'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
@@ -88,7 +95,7 @@ def get_url_meme():
     return url
 
 
-def bop(update: Update, context: CallbackContext):
+def send_meme_to_chat(update: Update, context: CallbackContext):
     url = get_url_meme()
     chat_id = update.message.chat_id
     context.bot.send_photo(chat_id=chat_id, photo=url)
@@ -340,26 +347,12 @@ def get_price_raw():
     eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
 
     dollar_per_rot = eth_per_rot / eth_per_usdt
-    # rot_per_eth = 1.0 / eth_per_rot
+
     return (eth_per_rot, dollar_per_rot)
 
 
 def get_price_simple(update: Update, context: CallbackContext):
-    # resp_rot = graphql_client.execute(req_graphql_rot)
-    # resp_usdt = graphql_client.execute(req_graphql_usdt)
-    #
-    # json_resp_rot = json.loads(resp_rot)
-    # json_resp_usdt = json.loads(resp_usdt)
-    #
-    # eth_per_rot = float(json_resp_rot['data']['token']['derivedETH'])
-    # eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
-    #
-    # dollar_per_rot = eth_per_rot / eth_per_usdt
-    # rot_per_eth = 1.0 / eth_per_rot
-
     (eth_per_rot, dollar_per_rot) = get_price_raw()
-
-    #log_current_price_rot_per_usd(dollar_per_rot)
 
     supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
@@ -411,7 +404,7 @@ def check_new_proposal(update: Update, context: CallbackContext):
     global last_time_checked
     new_time = round(time.time())
     if new_time - last_time_checked > 60:
-        
+
         print("Checking for new proposals...")
         log_current_price_rot_per_usd()
         last_time_checked = new_time
@@ -433,10 +426,51 @@ def check_new_proposal(update: Update, context: CallbackContext):
                     context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
 
 
+# util for get_chart_pyplot
+def keep_dates(list):
+    dates_str = []
+    for values in list:
+        dates_str.append(values[0])
+
+    dates_datetime = []
+    for date_str in dates_str:
+        date_datetime = datetime.strptime(date_str, '%m/%d/%Y,%H:%M:%S')
+        dates_datetime.append(date_datetime)
+    return dates_datetime
+
+
+def get_chart_pyplot(update: Update, context: CallbackContext):
+    list_time_price = []
+
+    with open(price_file_path, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            list_time_price.append((row[0], row[1]))
+        print(list_time_price)
+
+    dates_pure = keep_dates(list_time_price)
+
+    price = [float(value[1]) for value in list_time_price]
+
+    dates = matplotlib.dates.date2num(dates_pure)
+
+    f = plt.figure()
+    ax = f.add_subplot(111)
+    plt.ylabel('$/rot')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_label_position("right")
+
+    plt.plot_date(dates, price, 'g-o')
+    plt.gcf().autofmt_xdate()
+    plt.savefig(chart_file_path)
+    chat_id = update.message.chat_id
+    context.bot.send_photo(chat_id=chat_id, photo=chart_file_path)
+
+
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
     dp = updater.dispatcher
-    dp.add_handler(CommandHandler('rotme', bop))
+    dp.add_handler(CommandHandler('rotme', send_meme_to_chat))
     dp.add_handler(CommandHandler('rottedChart', chart))
     dp.add_handler(CommandHandler('maggotChart', chart_maggot))
     dp.add_handler(CommandHandler('rotfarmingguide', stake_command))
@@ -449,6 +483,7 @@ def main():
     dp.add_handler(CommandHandler('rot_price', get_price_simple))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
+    dp.add_handler(CommandHandler('get_chart', get_chart_pyplot))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
 
