@@ -516,7 +516,7 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
 
         print_chart(dates_pure, price)
 
-        caption = "Price of the last" + str(time_type) + str(time_type) + ".\nCurrent price: " + str(price[-1])
+        caption = "Price of the last" + str(time_start) + str(time_type) + ".\nCurrent price: " + str(price[-1])
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
 
