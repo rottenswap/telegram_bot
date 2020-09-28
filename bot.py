@@ -338,10 +338,13 @@ def check_file_already_present(meme_hash):
 def delete_meme(update: Update, context: CallbackContext):
     query_received = update.message.text.split(' ')
     if len(query_received) == 2:
+        print("someone wants to delete a meme")
         password = query_received[1]
         if password == "adbe5443-3bed-4230-a2e7-a94c8a8401ef":
+            print("password correct")
             to_delete = query_received[2]
             if check_file_already_present(to_delete):
+                print("meme found")
                 filename = to_delete + 'png'
                 index = repo.index
                 index.remove(MEME_GIT_REPO + "/memesFolder/" + filename)
