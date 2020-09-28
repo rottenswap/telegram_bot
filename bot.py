@@ -339,7 +339,7 @@ def delete_meme(update: Update, context: CallbackContext):
     query_received = update.message.text.split(' ')
     if len(query_received) == 2:
         password = query_received[1]
-        if password == "adbe5443-3bed-4230-a2e7-a94c8a8401ef"
+        if password == "adbe5443-3bed-4230-a2e7-a94c8a8401ef":
             to_delete = query_received[2]
             if check_file_already_present(to_delete):
                 filename = to_delete + 'png'
