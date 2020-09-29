@@ -70,6 +70,7 @@ url_coingecko_rot = 'https://www.coingecko.com/en/coins/rotten'
 url_livecoinwatch_rot = 'https://www.livecoinwatch.com/price/Rotten-ROT'
 url_twitter_rottenswap = 'https://twitter.com/rottenswap'
 url_reddit_rottenswap = 'https://www.reddit.com/r/RottenSwap/'
+url_coinmarketcap = 'https://coinmarketcap.com/currencies/rotten/'
 
 def create_href_str(url, message):
     return "<a href=\"" + url + "\">" + message + "</a>"
@@ -80,7 +81,7 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
             + '<b>Pools:</b> ' + create_href_str(url_uniswap_pool_rot_eht, 'ROT-ETH') + ' ' + create_href_str(url_uniswap_pool_rot_maggot, 'ROT-MAGGOT') + '\n' \
             + '<b>Etherscan:</b> ' + create_href_str(url_etherscan_rot, '$ROT') + " " + create_href_str(url_etherscan_maggot, '$MAGGOT') + '\n' \
             + '<b>Charts:</b> ' + create_href_str(url_astrotools_rot, 'Astrotools') + ' ' + create_href_str(url_dextools_rot, 'DexTools') + ' ' \
-            + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot, 'LiveCoinWatch') + '\n' \
+            + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot, 'LiveCoinWatch') + ' ' + create_href_str(url_coinmarketcap, 'CoinMarketCap') + '\n' \
             + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' +  create_href_str(url_reddit_rottenswap, 'Reddit') + '\n' \
         + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
 
