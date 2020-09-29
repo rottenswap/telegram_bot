@@ -57,6 +57,14 @@ how_many_tweets = 5
 rot_contract = '0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
 maggot_contract = '0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89'
 
+# Links
+links = '''<a href="rottenswap.org">website</a>
+<b>Uniswap:</b> <a href="https://app.uniswap.org/#/swap?inputCurrency=0xd04785c4d8195e4a54d9dec3a9043872875ae9e2">$ROT</a> <a href="https://app.uniswap.org/#/swap?inputCurrency=0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89">$MAGGOT</a>
+<b>Etherscan:</b> <a href="https://etherscan.io/token/0xd04785c4d8195e4a54d9dec3a9043872875ae9e2">$ROT</a> <a href="https://etherscan.io/token/0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89">$MAGGOT</a>
+<b>Charts:</b> <a href="https://app.astrotools.io/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888">Astrotools</a> <a href="https://www.dextools.io/app/uniswap/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888">DexTools</a>
+<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup
+'''
+
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
 assert not repo.bare
@@ -178,27 +186,10 @@ def get_biz(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True)
 
 
-# sends the astrotools chart of the $ROT token
-def chart(update: Update, context: CallbackContext):
-    test = "https://app.astrotools.io/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888"
+# sends the main links
+def get_links(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=test, disable_web_page_preview=True)
-
-
-# sends the astrotools chart of the $MAGGOT token
-def chart_maggot(update: Update, context: CallbackContext):
-    test = "https://app.astrotools.io/pair-explorer/0x46ba95ff4f4cd9353eadde43bee519fa50886e72"
-    chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=test, disable_web_page_preview=True)
-
-
-# uniswap page
-def get_uniswap(update: Update, context: CallbackContext):
-    test = """<b>$ROT</b> -> https://app.uniswap.org/#/swap?inputCurrency=0xd04785c4d8195e4a54d9dec3a9043872875ae9e2
-<b>$MAGGOT</b> -> https://app.uniswap.org/#/swap?inputCurrency=0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89"""
-    chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=test, parse_mode='html')
-
+    context.bot.send_message(chat_id=chat_id, text=links, disable_web_page_preview=True, parse_mode='html')
 
 # tutorial on how to stake
 def stake_command(update: Update, context: CallbackContext):
@@ -538,11 +529,9 @@ def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('rotme', send_meme_to_chat))
-    dp.add_handler(CommandHandler('rottedChart', chart))
-    dp.add_handler(CommandHandler('maggotChart', chart_maggot))
+    dp.add_handler(CommandHandler('links', get_links))
     dp.add_handler(CommandHandler('rotfarmingguide', stake_command))
     dp.add_handler(CommandHandler('howtoslippage', how_to_slippage))
-    dp.add_handler(CommandHandler('getuniswap', get_uniswap))
     dp.add_handler(CommandHandler('supplycap', get_supply_cap))
     dp.add_handler(CommandHandler('4biz', get_biz))
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
@@ -566,11 +555,9 @@ if __name__ == '__main__':
 commands = """
 help - Technical issues? A question? Need help?
 rotme - Give me a random meme
-rottedchart - Get the charts of $ROT
-maggotchart - Get the charts of $MAGGOTS
+links - Main links
 rotfarmingguide - Guide to $ROT farming
 howtoslippage - How to increase slippage
-getuniswap - Get the uniswap pages
 supplycap - How ROTTED are we
 4biz - List biz thread
 twitter - List twitter threads
