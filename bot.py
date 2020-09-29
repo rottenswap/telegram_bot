@@ -471,6 +471,7 @@ def print_chart(dates_raw, price):
     ax.yaxis.set_major_formatter('${x:1.3f}')
     ax.yaxis.tick_right()
     ax.yaxis.set_label_position("right")
+    ax.grid(alpha=0.2)
 
     plt.plot_date(dates, price, cb91_green)
     plt.gcf().autofmt_xdate()
