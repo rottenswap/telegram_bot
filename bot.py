@@ -60,19 +60,24 @@ maggot_contract = '0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89'
 url_website = 'rottenswap.org'
 url_uniswap_rot = 'https://app.uniswap.org/#/swap?inputCurrency=0xd04785c4d8195e4a54d9dec3a9043872875ae9e2'
 url_uniswap_maggot = 'https://app.uniswap.org/#/swap?inputCurrency=0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89'
+url_etherscan_rot = 'https://etherscan.io/token/0xd04785c4d8195e4a54d9dec3a9043872875ae9e2'
+url_etherscan_maggot = 'https://etherscan.io/token/0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89'
+url_astrotools_rot = 'https://app.astrotools.io/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888'
+url_dextools_rot = 'https://www.dextools.io/app/uniswap/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888'
+url_coingecko_rot = 'https://www.coingecko.com/en/coins/rotten'
+url_livecoinwatch_rot = 'https://www.livecoinwatch.com/price/Rotten-ROT'
 
 def create_href_str(url, message):
     return "<a href=\"" + url + "\">" + message + "</a>"
 
-the_links = "<b>Website:</b> " + create_href_str(url_website, "rottenswap.org")
 
-# Links
-links = '''<b>Website:</b> <a href="rottenswap.org">rottenswap.org</a>
-<b>Uniswap:</b> <a href="https://app.uniswap.org/#/swap?inputCurrency=0xd04785c4d8195e4a54d9dec3a9043872875ae9e2">$ROT</a> <a href="https://app.uniswap.org/#/swap?inputCurrency=0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89">$MAGGOT</a>
-<b>Etherscan:</b> <a href="https://etherscan.io/token/0xd04785c4d8195e4a54d9dec3a9043872875ae9e2">$ROT</a> <a href="https://etherscan.io/token/0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89">$MAGGOT</a>
-<b>Charts:</b> <a href="https://app.astrotools.io/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888">Astrotools</a> <a href="https://www.dextools.io/app/uniswap/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888">DexTools</a> 
-<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup
-'''
+links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\n' \
+            + '<b>Uniswap:</b> ' + create_href_str(url_uniswap_rot, "$ROT") + " " + create_href_str(url_uniswap_maggot, '$MAGGOT') + '\n' \
+            + '<b>Etherscan:</b> ' + create_href_str(url_etherscan_rot, '$ROT') + " " + create_href_str(url_etherscan_maggot, '$MAGGOT') + '\n' \
+            + '<b>Charts:</b> ' + create_href_str(url_astrotools_rot, 'Astrotools') + ' ' + create_href_str(url_dextools_rot, 'DexTools') + ' ' \
+            + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot, 'LiveCoinWatch') + '\n' \
+            + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup'
+
 
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
@@ -198,7 +203,8 @@ def get_biz(update: Update, context: CallbackContext):
 # sends the main links
 def get_links(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=the_links, disable_web_page_preview=True, parse_mode='html')
+    context.bot.send_message(chat_id=chat_id, text=links, disable_web_page_preview=True, parse_mode='html')
+
 
 # tutorial on how to stake
 def stake_command(update: Update, context: CallbackContext):
