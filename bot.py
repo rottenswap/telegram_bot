@@ -78,7 +78,7 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
             + '<b>Etherscan:</b> ' + create_href_str(url_etherscan_rot, '$ROT') + " " + create_href_str(url_etherscan_maggot, '$MAGGOT') + '\n' \
             + '<b>Charts:</b> ' + create_href_str(url_astrotools_rot, 'Astrotools') + ' ' + create_href_str(url_dextools_rot, 'DexTools') + ' ' \
             + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot, 'LiveCoinWatch') + '\n' \
-            + '<b>Social medias</b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' +  create_href_str(url_reddit_rottenswap, 'Reddit') + '\n' \
+            + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' +  create_href_str(url_reddit_rottenswap, 'Reddit') + '\n' \
         + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
 
 
