@@ -58,7 +58,7 @@ rot_contract = '0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
 maggot_contract = '0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89'
 
 # Links
-links = '''<a href="rottenswap.org">website</a>
+links = '''<b>Website:</b> <a href="rottenswap.org">rottenswap.org</a>
 <b>Uniswap:</b> <a href="https://app.uniswap.org/#/swap?inputCurrency=0xd04785c4d8195e4a54d9dec3a9043872875ae9e2">$ROT</a> <a href="https://app.uniswap.org/#/swap?inputCurrency=0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89">$MAGGOT</a>
 <b>Etherscan:</b> <a href="https://etherscan.io/token/0xd04785c4d8195e4a54d9dec3a9043872875ae9e2">$ROT</a> <a href="https://etherscan.io/token/0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89">$MAGGOT</a>
 <b>Charts:</b> <a href="https://app.astrotools.io/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888">Astrotools</a> <a href="https://www.dextools.io/app/uniswap/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888">DexTools</a>
