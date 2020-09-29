@@ -474,7 +474,7 @@ def print_chart(dates_raw, price):
 
     plt.plot_date(dates, price, cb91_green)
     plt.gcf().autofmt_xdate()
-    plt.savefig(chart_file_path, bbox_inches='tight')
+    plt.savefig(chart_file_path, bbox_inches='tight', dpi=300)
     plt.close(f)
 
 
