@@ -155,9 +155,9 @@ def get_supply_cap(update: Update, context: CallbackContext):
 # scraps /biz/ and returns a list of tuple (threadId, body, title) of threads matching the regex ^rot |rot$| rot |rotten|rotting
 def get_biz_threads():
     url = 'https://a.4cdn.org/biz/catalog.json'
-    json = requests.get(url).json()
+    response_json = requests.get(url).json()
     threads_ids = []
-    for page in json:
+    for page in response_json:
         for thread in page['threads']:
             try:
                 if 'com' in thread:
@@ -472,7 +472,8 @@ def print_chart(dates_raw, price):
     dates = matplotlib.dates.date2num(dates_raw)
     cb91_green = '#47DBCD'
     plt.style.use('dark_background')
-    f = plt.figure()
+    matplotlib.rcParams.update({'font.size': 22})
+    f = plt.figure(figsize=(16, 9))
     ax = f.add_subplot(111)
     ax.yaxis.set_major_formatter('${x:1.3f}')
     ax.yaxis.tick_right()
