@@ -647,6 +647,7 @@ def main():
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     dp.add_handler(CommandHandler('getChart', get_chart_price_pyplot))
+    dp.add_handler(CommandHandler('getChartSupply', get_chart_supply_pyplot))
     dp.add_handler(CommandHandler('governance', get_governance_channel))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
