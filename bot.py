@@ -230,7 +230,7 @@ def stake_command(update: Update, context: CallbackContext):
 
 4. Add Liquidity ...
 ...
-See the full instructions on https://pastebin.pl/view/raw/3db66672"""
+See the full instructions on https://pastebin.com/raw/1ypMEzKq"""
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=text, parse_mode='html')
 
