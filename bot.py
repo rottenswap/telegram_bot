@@ -594,7 +594,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
         caption = "Chart since the bot starting logging the supply.\nCurrent supply ROT: " + str(supply_rot[-1]) + ", MAGGOT: " + str(supply_maggot[-1])
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
@@ -618,7 +618,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
 
         caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply ROT: " + str(supply_rot[-1]) + ", MAGGOT: " + str(supply_maggot[-1])
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
 
 
 def get_governance_channel(update: Update, context: CallbackContext):
