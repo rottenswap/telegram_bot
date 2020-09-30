@@ -517,7 +517,7 @@ def print_chart_supply(dates_raw, supply_rot, supply_maggot):
     matplotlib.rcParams.update({'font.size': 22})
     f = plt.figure(figsize=(16, 9))
     ax = f.add_subplot(111)
-    ax.yaxis.set_major_formatter('${x}')
+    ax.yaxis.set_major_formatter('{x}')
     ax.yaxis.tick_right()
     ax.yaxis.set_label_position("right")
     ax.yaxis.grid(alpha=0.3, linestyle='--')
@@ -592,7 +592,9 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         supply_maggot = [int(value[2]) for value in list_time_supply]
 
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
-        caption = "Chart since the bot starting logging the supply.\nCurrent supply ROT: " + str(supply_rot[-1]) + ", MAGGOT: " + str(supply_maggot[-1])
+        current_rot_str = number_to_beautiful(supply_rot[-1])
+        current_maggot_str = number_to_beautiful(supply_maggot[-1])
+        caption = "Chart since the bot starting logging the supply.\nCurrent supply ROT: " + current_rot_str + ", MAGGOT: " + current_maggot_str
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
@@ -615,8 +617,9 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         supply_maggot = [int(value[2]) for value in list_time_supply]
 
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
-
-        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply ROT: " + str(supply_rot[-1]) + ", MAGGOT: " + str(supply_maggot[-1])
+        current_rot_str = number_to_beautiful(supply_rot[-1])
+        current_maggot_str = number_to_beautiful(supply_maggot[-1])
+        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply ROT: " + current_rot_str + ", MAGGOT: " + current_maggot_str
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
 
