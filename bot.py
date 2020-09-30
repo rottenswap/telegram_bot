@@ -37,7 +37,8 @@ graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/
 # log_file
 price_file_path = '/home/debian/rot/log_files/price_hist.txt'
 supply_file_path = '/home/debian/rot/log_files/supply_hist.txt'
-chart_file_path = '/home/debian/rot/log_files/chart.png'
+chart_price_file_path = '/home/debian/rot/log_files/chart_price.png'
+chart_supply_file_path = '/home/debian/rot/log_files/chart_supply.png'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
@@ -491,7 +492,7 @@ def keep_dates(values_list):
     return dates_datetime
 
 
-def print_chart(dates_raw, price):
+def print_chart_price(dates_raw, price):
     dates = matplotlib.dates.date2num(dates_raw)
     cb91_green = '#47DBCD'
     plt.style.use('dark_background')
@@ -505,11 +506,32 @@ def print_chart(dates_raw, price):
 
     plt.plot_date(dates, price, cb91_green)
     plt.gcf().autofmt_xdate()
-    plt.savefig(chart_file_path, bbox_inches='tight', dpi=300)
+    plt.savefig(chart_price_file_path, bbox_inches='tight', dpi=300)
     plt.close(f)
 
 
-def get_chart_pyplot(update: Update, context: CallbackContext):
+def print_chart_supply(dates_raw, supply_rot, supply_maggot):
+    dates = matplotlib.dates.date2num(dates_raw)
+    cb91_green = '#47DBCD'
+    plt.style.use('dark_background')
+    matplotlib.rcParams.update({'font.size': 22})
+    f = plt.figure(figsize=(16, 9))
+    ax = f.add_subplot(111)
+    ax.yaxis.set_major_formatter('${x}')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_label_position("right")
+    ax.yaxis.grid(alpha=0.3, linestyle='--')
+
+    plt.plot_date(dates, supply_rot, cb91_green, label='rot supply')
+    plt.plot_date(dates, supply_maggot, 'r', label='maggot supply')
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
+               ncol=2, mode="expand", borderaxespad=0.)
+    plt.gcf().autofmt_xdate()
+    plt.savefig(chart_supply_file_path, bbox_inches='tight', dpi=300)
+    plt.close(f)
+
+
+def get_chart_price_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     list_time_price = []
 
@@ -524,10 +546,10 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
 
         price = [float(value[1]) for value in list_time_price]
 
-        print_chart(dates_pure, price)
+        print_chart_price(dates_pure, price)
         caption = "Chart since the bot starting logging the price.\nCurrent price: $" + str(price[-1])[0:10]
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range)")
@@ -546,11 +568,57 @@ def get_chart_pyplot(update: Update, context: CallbackContext):
         dates_pure = keep_dates(filtered_values)
         price = [float(value[1]) for value in filtered_values]
 
-        print_chart(dates_pure, price)
+        print_chart_price(dates_pure, price)
 
         caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: $" + str(price[-1])[0:10]
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
+
+
+def get_chart_supply_pyplot(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    list_time_supply = []
+
+    with open(supply_file_path, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            list_time_supply.append((row[0], row[1], row[2]))
+
+    query_received = update.message.text.split(' ')
+    if len(query_received) == 1:
+        dates_pure = keep_dates(list_time_supply)
+
+        supply_rot = [int(value[1]) for value in list_time_supply]
+        supply_maggot = [int(value[2]) for value in list_time_supply]
+
+        print_chart_supply(dates_pure, supply_rot, supply_maggot)
+        caption = "Chart since the bot starting logging the supply.\nCurrent supply ROT: " + str(supply_rot[-1]) + ", MAGGOT: " + str(supply_maggot[-1])
+
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
+    elif len(query_received) > 3 or len(query_received) == 2:
+        context.bot.send_message(chat_id=chat_id,
+                                 text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
+    else:
+        time_type = query_received[2]
+        time_start = int(query_received[1])
+        multiplier = 1
+        if time_type == 'h' or time_type == 'H':
+            multiplier = 60
+        if time_type == 'd' or time_type == 'D':
+            multiplier = 1440
+
+        start_range = int(time_start * multiplier)
+        filtered_values = list_time_supply[-start_range: -1]
+
+        dates_pure = keep_dates(filtered_values)
+        supply_rot = [int(value[1]) for value in list_time_supply]
+        supply_maggot = [int(value[2]) for value in list_time_supply]
+
+        print_chart_supply(dates_pure, supply_rot, supply_maggot)
+
+        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply ROT: " + str(supply_rot[-1]) + ", MAGGOT: " + str(supply_maggot[-1])
+
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
 
 
 def get_governance_channel(update: Update, context: CallbackContext):
@@ -578,7 +646,7 @@ def main():
     dp.add_handler(CommandHandler('rot_price', get_price_simple))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
-    dp.add_handler(CommandHandler('getChart', get_chart_pyplot))
+    dp.add_handler(CommandHandler('getChart', get_chart_price_pyplot))
     dp.add_handler(CommandHandler('governance', get_governance_channel))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
