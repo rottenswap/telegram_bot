@@ -71,6 +71,8 @@ url_livecoinwatch_rot = 'https://www.livecoinwatch.com/price/Rotten-ROT'
 url_twitter_rottenswap = 'https://twitter.com/rottenswap'
 url_reddit_rottenswap = 'https://www.reddit.com/r/RottenSwap/'
 url_coinmarketcap = 'https://coinmarketcap.com/currencies/rotten/'
+url_merch_site1 = 'https://rottenswag.com/'
+url_merch_site2 = 'https://rottenmerch.launchcart.store/shop'
 
 def create_href_str(url, message):
     return "<a href=\"" + url + "\">" + message + "</a>"
@@ -83,7 +85,8 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
             + '<b>Charts:</b> ' + create_href_str(url_astrotools_rot, 'Astrotools') + ' ' + create_href_str(url_dextools_rot, 'DexTools') + ' ' \
             + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot, 'LiveCoinWatch') + ' ' + create_href_str(url_coinmarketcap, 'CoinMarketCap') + '\n' \
             + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' +  create_href_str(url_reddit_rottenswap, 'Reddit') + '\n' \
-        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
+            + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2, 'RottenMerch') + '\n' \
+             + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
 
 
 # GIT INIT
