@@ -519,11 +519,11 @@ def print_chart_supply(dates_raw, supply_rot, supply_maggot):
     f = plt.figure(figsize=(16, 9))
 
     ax = f.add_subplot(111)
-    ax.yaxis.set_major_formatter('{x}')
+    ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
     plot1 = ax.plot_date(dates, supply_maggot, 'r', label='maggot')
 
     ax2 = ax.twinx()
-    ax2.yaxis.set_major_formatter('{x}')
+    ax2.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
     plot2 = ax2.plot_date(dates, supply_rot, cb91_green, label='rot')
 
     ax.set_ylabel("Maggot")
