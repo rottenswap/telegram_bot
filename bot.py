@@ -560,7 +560,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id,
-                                 text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range)")
+                                 text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
     else:
         time_type = query_received[2]
         time_start = int(query_received[1])
