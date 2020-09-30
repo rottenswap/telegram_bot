@@ -36,6 +36,7 @@ graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/
 
 # log_file
 price_file_path = '/home/debian/rot/log_files/price_hist.txt'
+supply_file_path = '/home/debian/rot/log_files/supply_hist.txt'
 chart_file_path = '/home/debian/rot/log_files/chart.png'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
@@ -413,6 +414,17 @@ def log_current_price_rot_per_usd():
         date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
         message_to_write = date_time_str + " " + str(dollar_per_rot) + "\n"
         price_file.write(message_to_write)
+
+
+def log_current_supply():
+    global supply_file_path
+    number_rot = get_supply_cap_raw(rot_contract)
+    number_maggots = get_supply_cap_raw(maggot_contract)
+    with open(supply_file_path, "a") as supply_file:
+        time_now = datetime.now()
+        date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
+        message_to_write = date_time_str + " " + str(number_rot) + " " + str(number_maggots) + "\n"
+        supply_file.write(message_to_write)
 
 
 def get_help(update: Update, context: CallbackContext):
