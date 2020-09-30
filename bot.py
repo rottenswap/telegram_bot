@@ -604,7 +604,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         current_maggot_str = number_to_beautiful(supply_maggot[-1])
         caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption, parse_mode="html")
     elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
