@@ -514,18 +514,26 @@ def print_chart_supply(dates_raw, supply_rot, supply_maggot):
     dates = matplotlib.dates.date2num(dates_raw)
     cb91_green = '#47DBCD'
     plt.style.use('dark_background')
+
     matplotlib.rcParams.update({'font.size': 22})
     f = plt.figure(figsize=(16, 9))
+
     ax = f.add_subplot(111)
     ax.yaxis.set_major_formatter('{x}')
-    ax.yaxis.tick_right()
-    ax.yaxis.set_label_position("right")
-    ax.yaxis.grid(alpha=0.3, linestyle='--')
+    plot1 = ax.plot_date(dates, supply_maggot, 'r', label='maggot')
 
-    plt.plot_date(dates, supply_rot, cb91_green, label='rot supply')
-    plt.plot_date(dates, supply_maggot, 'r', label='maggot supply')
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
-               ncol=2, mode="expand", borderaxespad=0.)
+    ax2 = ax.twinx()
+    ax2.yaxis.set_major_formatter('{x}')
+    plot2 = ax2.plot_date(dates, supply_rot, cb91_green, label='rot')
+
+    ax.set_ylabel("Maggot")
+    ax2.set_ylabel("Rot")
+
+    plots = plot1 + plot2
+    labs = [l.get_label() for l in plots]
+    ax.legend(plots, labs, bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
+              ncol=2, mode="expand", borderaxespad=0.)
+
     plt.gcf().autofmt_xdate()
     plt.savefig(chart_supply_file_path, bbox_inches='tight', dpi=300)
     plt.close(f)
