@@ -602,7 +602,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
         current_rot_str = number_to_beautiful(supply_rot[-1])
         current_maggot_str = number_to_beautiful(supply_maggot[-1])
-        caption = "Chart since the bot starting logging the supply.\nCurrent supply ROT: " + current_rot_str + ", MAGGOT: " + current_maggot_str
+        caption = "Chart since the bot starting logging the supply.\nCurrent supply ROT: " + current_rot_str + " -- MAGGOT: " + current_maggot_str
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
@@ -627,7 +627,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
         current_rot_str = number_to_beautiful(supply_rot[-1])
         current_maggot_str = number_to_beautiful(supply_maggot[-1])
-        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply ROT: " + current_rot_str + ", MAGGOT: " + current_maggot_str
+        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply ROT: " + current_rot_str + " -- MAGGOT: " + current_maggot_str
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
 
