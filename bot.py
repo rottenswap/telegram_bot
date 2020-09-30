@@ -613,8 +613,8 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         filtered_values = list_time_supply[-start_range: -1]
 
         dates_pure = keep_dates(filtered_values)
-        supply_rot = [int(value[1]) for value in list_time_supply]
-        supply_maggot = [int(value[2]) for value in list_time_supply]
+        supply_rot = [int(value[1]) for value in filtered_values]
+        supply_maggot = [int(value[2]) for value in filtered_values]
 
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
         current_rot_str = number_to_beautiful(supply_rot[-1])
