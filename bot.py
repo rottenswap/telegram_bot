@@ -506,7 +506,7 @@ def print_chart_price(dates_raw, price):
 
     plt.plot_date(dates, price, cb91_green)
     plt.gcf().autofmt_xdate()
-    plt.savefig(chart_price_file_path, bbox_inches='tight', dpi=300)
+    plt.savefig(chart_supply_file_path, bbox_inches='tight', dpi=300)
     plt.close(f)
 
 
