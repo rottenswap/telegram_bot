@@ -555,9 +555,9 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
         price = [float(value[1]) for value in list_time_price]
 
         print_chart_price(dates_pure, price)
-        caption = "Chart since the bot starting logging the price.\nCurrent price: $" + str(price[-1])[0:10]
+        caption = "Chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption, parse_mode="html")
     elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
@@ -578,9 +578,9 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
 
         print_chart_price(dates_pure, price)
 
-        caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: $" + str(price[-1])[0:10]
+        caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption, parse_mode="html")
 
 
 def get_chart_supply_pyplot(update: Update, context: CallbackContext):
@@ -602,7 +602,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
         current_rot_str = number_to_beautiful(supply_rot[-1])
         current_maggot_str = number_to_beautiful(supply_maggot[-1])
-        caption = "Chart since the bot starting logging the supply.\nCurrent supply ROT: " + current_rot_str + " -- MAGGOT: " + current_maggot_str
+        caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
 
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
     elif len(query_received) > 3 or len(query_received) == 2:
@@ -627,9 +627,9 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
         current_rot_str = number_to_beautiful(supply_rot[-1])
         current_maggot_str = number_to_beautiful(supply_maggot[-1])
-        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply ROT: " + current_rot_str + " -- MAGGOT: " + current_maggot_str
+        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption)
+        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption, parse_mode="html")
 
 
 def get_governance_channel(update: Update, context: CallbackContext):
