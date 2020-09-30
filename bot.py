@@ -458,6 +458,7 @@ def check_new_proposal(update: Update, context: CallbackContext):
 
         print("Checking for new proposals...")
         log_current_price_rot_per_usd()
+        log_current_supply()
         last_time_checked = new_time
         response_json = requests.get(api_proposal_url).json()
         if response_json != "" or response_json is not None:
