@@ -460,23 +460,23 @@ def check_new_proposal(update: Update, context: CallbackContext):
         print("Checking for new proposals...")
         log_current_price_rot_per_usd()
         log_current_supply()
-        last_time_checked = new_time
-        response_json = requests.get(api_proposal_url).json()
-        if response_json != "" or response_json is not None:
-            last_proposal = response_json[-1]
-            id_last_proposal = last_proposal['id']
-            if last_proposal_received_id == -1:  # check if the bot just initialized
-                last_proposal_received_id = id_last_proposal
-            else:
-                if id_last_proposal > last_proposal_received_id:
-                    last_proposal_received_id = id_last_proposal
-                    proposal_title = last_proposal['title']
-                    description = last_proposal['description']
-                    message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
-                              + description + '\nGo vote at ' \
-                              + telegram_governance_url
-                    print("New proposal found and sent")
-                    context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
+        # last_time_checked = new_time
+        # response_json = requests.get(api_proposal_url).json()
+        # if response_json != "" or response_json is not None:
+        #     last_proposal = response_json[-1]
+        #     id_last_proposal = last_proposal['id']
+        #     if last_proposal_received_id == -1:  # check if the bot just initialized
+        #         last_proposal_received_id = id_last_proposal
+        #     else:
+        #         if id_last_proposal > last_proposal_received_id:
+        #             last_proposal_received_id = id_last_proposal
+        #             proposal_title = last_proposal['title']
+        #             description = last_proposal['description']
+        #             message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
+        #                       + description + '\nGo vote at ' \
+        #                       + telegram_governance_url
+        #             print("New proposal found and sent")
+        #             context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
 
 
 # util for get_chart_pyplot
@@ -632,17 +632,6 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption, parse_mode="html")
 
 
-def get_governance_channel(update: Update, context: CallbackContext):
-    chat_id = update.message.chat_id
-    response_json = requests.get(api_proposal_url).json()
-    values = response_json[-6:-1]
-    titles = ""
-    for value in values:
-        titles = titles + value['title'] + '\n'
-    message = telegram_governance_url + '\nLast 5 proposals:\n' + titles
-    context.bot.send_message(chat_id=chat_id, text=message)
-
-
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
     dp = updater.dispatcher
@@ -659,7 +648,6 @@ def main():
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     dp.add_handler(CommandHandler('getChart', get_chart_price_pyplot))
     dp.add_handler(CommandHandler('getChartSupply', get_chart_supply_pyplot))
-    dp.add_handler(CommandHandler('governance', get_governance_channel))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
@@ -682,6 +670,5 @@ supplycap - How ROTTED are we
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
-governance - Get the governance channel
 getchart - Display a (simple) price chart
 """
