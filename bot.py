@@ -627,14 +627,16 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
     else:
         time_type = query_received[2]
         time_start = int(query_received[1])
-        multiplier = 1
+        k_hours = 0
+        k_days = 0
         if time_type == 'h' or time_type == 'H':
-            multiplier = 60
+            k_hours = time_start
         if time_type == 'd' or time_type == 'D':
-            multiplier = 1440
+            k_days = time_start
 
-        start_range = int(time_start * multiplier)
-        filtered_values = list_time_supply[-start_range: -1]
+        now = datetime.utcnow()
+
+        filtered_values = [x for x in list_time_supply if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
 
         dates_pure = keep_dates(filtered_values)
         supply_rot = [int(value[1]) for value in filtered_values]
