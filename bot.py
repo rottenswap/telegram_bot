@@ -76,6 +76,7 @@ url_coinmarketcap = 'https://coinmarketcap.com/currencies/rotten/'
 url_merch_site1 = 'https://rottenswag.com/'
 url_merch_site2 = 'https://rottenmerch.launchcart.store/shop'
 
+
 def create_href_str(url, message):
     return "<a href=\"" + url + "\">" + message + "</a>"
 
@@ -89,7 +90,6 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
             + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' +  create_href_str(url_reddit_rottenswap, 'Reddit') + '\n' \
             + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2, 'RottenMerch') + '\n' \
              + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
-
 
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
@@ -295,7 +295,7 @@ def get_last_tweets(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=chat_id, text=full_message, parse_mode='html', disable_web_page_preview=True)
 
 
-### ADD MEME
+# ADD MEME
 def add_meme(update: Update, context: CallbackContext):
     try:
         caption = update['message']['caption']
@@ -456,11 +456,10 @@ def check_new_proposal(update: Update, context: CallbackContext):
     global last_time_checked
     new_time = round(time.time())
     if new_time - last_time_checked > 60:
-
         print("Checking for new proposals...")
         log_current_price_rot_per_usd()
         log_current_supply()
-        # last_time_checked = new_time
+        last_time_checked = new_time
         # response_json = requests.get(api_proposal_url).json()
         # if response_json != "" or response_json is not None:
         #     last_proposal = response_json[-1]
@@ -557,7 +556,10 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
         print_chart_price(dates_pure, price)
         caption = "Chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption, parse_mode="html")
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(chart_price_file_path, 'rb'),
+                               caption=caption,
+                               parse_mode="html")
     elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
@@ -580,7 +582,10 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
 
         caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_price_file_path, 'rb'), caption=caption, parse_mode="html")
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(chart_price_file_path, 'rb'),
+                               caption=caption,
+                               parse_mode="html")
 
 
 def get_chart_supply_pyplot(update: Update, context: CallbackContext):
@@ -604,7 +609,11 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         current_maggot_str = number_to_beautiful(supply_maggot[-1])
         caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption, parse_mode="html")
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(chart_supply_file_path, 'rb'),
+                               caption=caption,
+                               parse_mode="html")
+
     elif len(query_received) > 3 or len(query_received) == 2:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
@@ -627,9 +636,13 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         print_chart_supply(dates_pure, supply_rot, supply_maggot)
         current_rot_str = number_to_beautiful(supply_rot[-1])
         current_maggot_str = number_to_beautiful(supply_maggot[-1])
-        caption = "Supply of the last " + str(time_start) + str(time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
+        caption = "Supply of the last " + str(time_start) + str(
+            time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
 
-        context.bot.send_photo(chat_id=chat_id, photo=open(chart_supply_file_path, 'rb'), caption=caption, parse_mode="html")
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(chart_supply_file_path, 'rb'),
+                               caption=caption,
+                               parse_mode="html")
 
 
 def main():
