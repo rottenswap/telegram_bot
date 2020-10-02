@@ -787,7 +787,8 @@ def get_airdrop(update: Update, context: CallbackContext):
 - Fill the form : https://docs.google.com/forms/d/1Zjb0m9tSpqkjG9qql6kuMNIBLU7_29kekDf4rVOrUS4</a>'''
     context.bot.send_message(chat_id=chat_id,
                              text=message,
-                             parse_mode='html')
+                             parse_mode='html',
+                             disable_web_page_preview=True)
 
 
 
