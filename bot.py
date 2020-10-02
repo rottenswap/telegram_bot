@@ -659,7 +659,14 @@ def print_candlelight(dates, openings, closes, highs, lows):
     fig.update_layout(
         #title='Road to $.666',
         yaxis_title='ROT price (usdt)',
-        xaxis_rangeslider_visible=False
+        xaxis_rangeslider_visible=False,
+        yaxis_side="right",
+        margin=go.layout.Margin(
+            l=15,  # left margin
+            r=15,  # right margin
+            b=15,  # bottom margin
+            t=15,  # top margin
+        )
     )
     fig.write_image(candels_file_path, scale=4)
     plt.close()
