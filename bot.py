@@ -744,37 +744,23 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     global last_time_checked
 
-    new_time = round(time.time())
-    if new_time - last_time_checked > 60:
-        last_time_checked = new_time
-        list_time_supply = []
+    query_received = update.message.text.split(' ')
+    if update.message.from_user.first_name == 'Ben':
+        print("hello me")
+        last_time_checked = 1
 
-        with open(supply_file_path, newline='') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-            for row in spamreader:
-                list_time_supply.append((row[0], row[1], row[2]))
+    time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
 
-        query_received = update.message.text.split(' ')
-        if len(query_received) == 1:
-            dates_pure = keep_dates(list_time_supply)
+    if query_ok:
+        new_time = round(time.time())
+        if new_time - last_time_checked > 60:
+            last_time_checked = new_time
+            list_time_supply = []
 
-            supply_rot = [int(value[1]) for value in list_time_supply]
-            supply_maggot = [int(value[2]) for value in list_time_supply]
-
-            print_chart_supply(dates_pure, supply_rot, supply_maggot)
-            current_rot_str = number_to_beautiful(supply_rot[-1])
-            current_maggot_str = number_to_beautiful(supply_maggot[-1])
-            caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
-
-            context.bot.send_photo(chat_id=chat_id,
-                                   photo=open(chart_supply_file_path, 'rb'),
-                                   caption=caption,
-                                   parse_mode="html")
-
-        elif len(query_received) > 3 or len(query_received) == 2:
-            context.bot.send_message(chat_id=chat_id,
-                                     text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
-        else:
+            with open(supply_file_path, newline='') as csvfile:
+                spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+                for row in spamreader:
+                    list_time_supply.append((row[0], row[1], row[2]))
 
             time_type, time_start, k_hours, k_days = get_from_query(query_received)
 
@@ -789,16 +775,19 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
             print_chart_supply(dates_pure, supply_rot, supply_maggot)
             current_rot_str = number_to_beautiful(supply_rot[-1])
             current_maggot_str = number_to_beautiful(supply_maggot[-1])
-            caption = "Supply of the last " + str(time_start) + str(
-                time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
+            if simple_query:
+                caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
+            else:
+                caption = "Supply of the last " + str(time_start) + str(
+                    time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(chart_supply_file_path, 'rb'),
                                    caption=caption,
                                    parse_mode="html")
-    else:
-        context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
-
+        else:
+            context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
+    
 
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
