@@ -579,7 +579,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
         if new_time - last_time_checked > 60:
             last_time_checked = new_time
             list_time_price = []
-    
+
             with open(price_file_path, newline='') as csvfile:
                 spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
                 for row in spamreader:
@@ -593,7 +593,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
             price = [float(value[1]) for value in filtered_values]
 
             print_chart_price(dates_pure, price)
-            
+
             if simple_query:
                 caption = "Chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
             else:
