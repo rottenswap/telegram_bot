@@ -21,6 +21,7 @@ import os
 import json
 from bot_util import RepeatedTimer
 import plotly.graph_objects as go
+import pprint
 
 # ENV FILES
 etherscan_api_key = os.environ.get('ETH_API_KEY')
@@ -699,9 +700,11 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
 
     query_received = update.message.text.split(' ')
     from_user = update.message.from_user
-    print('from_user = ' + from_user)
+    print('from_user = ')
+    pprint.pprint(from_user)
+    
     name = from_user.first_name
-    print(name)
+    pprint.pprint(name)
 
     time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
 
