@@ -780,7 +780,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
 
 def get_airdrop(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    message = '''<a href = https://twitter.com/RottenSwap/status/1311624434038509568>As promised, here are the #airdrop details:
+    message = '''<a href="https://twitter.com/RottenSwap/status/1311624434038509568">As promised, here are the #airdrop details:
 - Follow us, like and RT this tweet (click me),
 - Join our TelegramGroup http://t.me/rottenswap,
 - Hold 7,500 $ROT tokens minimum at snapshot time (random time between 1st and 31st October),
@@ -835,5 +835,5 @@ rot_price - Display a (simple) view of the $ROT price
 getchart - Display a (simple) price chart
 getchartsupply - Display a graph of the supply cap
 candlestick - Candlestick chart 
-aidrop - Info about the airdrop
+airdrop - Info about the airdrop
 """
