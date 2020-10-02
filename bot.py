@@ -784,7 +784,7 @@ def get_airdrop(update: Update, context: CallbackContext):
 - Follow us, like and RT this tweet (click me),
 - Join our TelegramGroup http://t.me/rottenswap,
 - Hold 7,500 $ROT tokens minimum at snapshot time (random time between 1st and 31st October),
-- Fill the form : https://docs.google.com/forms/d/1Zjb0m9tSpqkjG9qql6kuMNIBLU7_29kekDf4rVOrUS4</a>'''
+- Fill the form:</a> <a href="https://docs.google.com/forms/d/1Zjb0m9tSpqkjG9qql6kuMNIBLU7_29kekDf4rVOrUS4">https://docs.google.com/forms/d/1Zjb0m9tSpqkjG9qql6kuMNIBLU7_29kekDf4rVOrUS4</a>'''
     context.bot.send_message(chat_id=chat_id,
                              text=message,
                              parse_mode='html',
