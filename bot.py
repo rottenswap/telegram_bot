@@ -485,6 +485,7 @@ Con.Adr = 0xd04...9e2
 
 
 def get_from_query(query_received):
+
     time_type = query_received[2]
     time_start = int(query_received[1])
     if time_start < 0:
@@ -686,9 +687,9 @@ def check_query(query_received):
     query_ok, simple_query = True, False
     time_type, time_start, k_hours, k_days = 'd', 0, 0, 100
     if len(query_received) == 1:
-        time_type, time_start, k_hours, k_days = get_from_query(query_received)
-    elif len(query_received) == 3:
         simple_query = True
+    elif len(query_received) == 3:
+        time_type, time_start, k_hours, k_days = get_from_query(query_received)
     else:
         query_ok = False
     return time_type, time_start, k_hours, k_days, query_ok, simple_query
@@ -699,12 +700,9 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
     global last_time_checked
 
     query_received = update.message.text.split(' ')
-    from_user = update.message.from_user
-    print('from_user = ')
-    pprint.pprint(from_user)
-    
-    name = from_user.first_name
-    pprint.pprint(name)
+    if update.message.from_user.first_name == 'Ben':
+        print("hello me")
+        last_time_checked = 1
 
     time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
 
