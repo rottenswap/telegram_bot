@@ -811,7 +811,7 @@ def main():
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(CommandHandler('candlestick', get_candlestick_pyplot))
-    dp.add_handler(CommandHandler('airdrop', get_airdrop))
+    dp.add_handler(CommandHandler('airdropinfo', get_airdrop))
     # dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
     RepeatedTimer(15, log_current_price_rot_per_usd)
     RepeatedTimer(15, log_current_supply)
@@ -836,5 +836,5 @@ rot_price - Display a (simple) view of the $ROT price
 getchart - Display a (simple) price chart
 getchartsupply - Display a graph of the supply cap
 candlestick - Candlestick chart 
-airdrop - Info about the airdrop
+airdropinfo - Info about the airdrop
 """
