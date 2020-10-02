@@ -496,6 +496,21 @@ def keep_dates(values_list):
     return dates_datetime
 
 
+def filter_values(values_list, type, time_delta):
+
+    filtered_values = []
+    now = datetime.utcnow()
+
+    for value in values_list:
+        date = strp_date(value[0])
+        if now - date < time_delta:
+            if type == "price":
+                filtered_values.append((date, value[1]))
+            elif type == "supply":
+                filtered_values.append((date, value[1], value[2]))
+    return filtered_values
+
+
 def print_chart_price(dates_raw, price):
     dates = matplotlib.dates.date2num(dates_raw)
     cb91_green = '#47DBCD'
@@ -578,13 +593,13 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
         if time_type == 'd' or time_type == 'D':
             k_days = time_start
 
-        now = datetime.utcnow()
-
-        filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
-
-        dates_pure = keep_dates(filtered_values)
+        delta = timedelta(days=k_days, hours=k_hours)
+    
+        filtered_values = filter_values(list_time_price, "price", delta)
+    
+        dates_pure = [value[0] for value in filtered_values]        
         price = [float(value[1]) for value in filtered_values]
-
+    
         print_chart_price(dates_pure, price)
 
         caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
@@ -633,12 +648,12 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
             k_hours = time_start
         if time_type == 'd' or time_type == 'D':
             k_days = time_start
+        
+        delta = timedelta(days=k_days, hours=k_hours)
 
-        now = datetime.utcnow()
+        filtered_values = filter_values(list_time_supply, "supply", delta)
 
-        filtered_values = [x for x in list_time_supply if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
-
-        dates_pure = keep_dates(filtered_values)
+        dates_pure = [value[0] for value in filtered_values]
         supply_rot = [int(value[1]) for value in filtered_values]
         supply_maggot = [int(value[2]) for value in filtered_values]
 
