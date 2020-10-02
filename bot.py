@@ -453,16 +453,18 @@ Con.Adr = 0xd04...9e2
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
-
-def check_new_proposal(update: Update, context: CallbackContext):
-    global last_proposal_received_id
-    global last_time_checked
-    new_time = round(time.time())
-    if new_time - last_time_checked > 60:
+ 
+# def check_new_proposal(update: Update, context: CallbackContext):
+#     global last_proposal_received_id
+#     global last_time_checked
+#     
+#     new_time = round(time.time())
+#     if new_time - last_time_checked > 60:
+#         pass
         # print("Checking for new proposals...")
         # log_current_price_rot_per_usd()
         # log_current_supply()
-        last_time_checked = new_time
+        # last_time_checked = new_time
         # response_json = requests.get(api_proposal_url).json()
         # if response_json != "" or response_json is not None:
         #     last_proposal = response_json[-1]
@@ -630,7 +632,6 @@ def chunks(lst, n):
 
 # date opening closing high low
 def transform_to_candelstick_format(list_values, resolution):
-
     if len(list_values) > 600:
         subvalues = chunks(list_values, 4*resolution*2)
     else:
@@ -660,16 +661,11 @@ def print_candlelight(dates, openings, closes, highs, lows):
                                          low=lows,
                                          close=closes)])
     fig.update_layout(
-        #title='Road to $.666',
+        # title='Road to $.666',
         yaxis_title='ROT price (usdt)',
         xaxis_rangeslider_visible=False,
         yaxis_side="right",
-        margin=go.layout.Margin(
-            l=15,  # left margin
-            r=15,  # right margin
-            b=15,  # bottom margin
-            t=15,  # top margin
-        )
+        margin=go.layout.Margin(l=15, r=15, b=15, t=15)
     )
     fig.write_image(candels_file_path, scale=4)
     plt.close()
@@ -677,99 +673,111 @@ def print_candlelight(dates, openings, closes, highs, lows):
 
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    list_time_price = []
+    global last_time_checked
 
-    with open(price_file_path, newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        for row in spamreader:
-            list_time_price.append((row[0], row[1]))
-
-    query_received = update.message.text.split(' ')
-    if len(query_received) == 1:
-        resolution = 1
-        (dates, openings, closes, highs, lows) = transform_to_candelstick_format(list_time_price, resolution)
-
-        print_candlelight(dates, openings, closes, highs, lows)
-        caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
-
-        context.bot.send_photo(chat_id=chat_id,
-                               photo=open(candels_file_path, 'rb'),
-                               caption=caption,
-                               parse_mode="html")
-    elif len(query_received) > 3 or len(query_received) == 2:
-        context.bot.send_message(chat_id=chat_id,
-                                 text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
+    new_time = round(time.time())
+    if new_time - last_time_checked > 60:
+        last_time_checked = new_time
+        list_time_price = []
+    
+        with open(price_file_path, newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in spamreader:
+                list_time_price.append((row[0], row[1]))
+    
+        query_received = update.message.text.split(' ')
+        if len(query_received) == 1:
+            resolution = 1
+            (dates, openings, closes, highs, lows) = transform_to_candelstick_format(list_time_price, resolution)
+    
+            print_candlelight(dates, openings, closes, highs, lows)
+            caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+    
+            context.bot.send_photo(chat_id=chat_id,
+                                   photo=open(candels_file_path, 'rb'),
+                                   caption=caption,
+                                   parse_mode="html")
+        elif len(query_received) > 3 or len(query_received) == 2:
+            context.bot.send_message(chat_id=chat_id,
+                                     text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
+        else:
+            time_type, time_start, k_hours, k_days = get_from_query(query_received)
+            now = datetime.utcnow()
+    
+            filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+            resolution = 1
+            (dates, openings, closes, highs, lows) = transform_to_candelstick_format(filtered_values, resolution)
+    
+            print_candlelight(dates, openings, closes, highs, lows)
+    
+            caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+    
+            context.bot.send_photo(chat_id=chat_id,
+                                   photo=open(candels_file_path, 'rb'),
+                                   caption=caption,
+                                   parse_mode="html")
     else:
-        time_type, time_start, k_hours, k_days = get_from_query(query_received)
-        now = datetime.utcnow()
-
-        filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
-        resolution = 1
-        (dates, openings, closes, highs, lows) = transform_to_candelstick_format(filtered_values, resolution)
-
-        print_candlelight(dates, openings, closes, highs, lows)
-
-        caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
-
-        context.bot.send_photo(chat_id=chat_id,
-                               photo=open(candels_file_path, 'rb'),
-                               caption=caption,
-                               parse_mode="html")
+        context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
 
 
 def get_chart_supply_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    list_time_supply = []
-
-    with open(supply_file_path, newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        for row in spamreader:
-            list_time_supply.append((row[0], row[1], row[2]))
-
-    query_received = update.message.text.split(' ')
-    if len(query_received) == 1:
-        dates_pure = keep_dates(list_time_supply)
-
-        supply_rot = [int(value[1]) for value in list_time_supply]
-        supply_maggot = [int(value[2]) for value in list_time_supply]
-
-        print_chart_supply(dates_pure, supply_rot, supply_maggot)
-        current_rot_str = number_to_beautiful(supply_rot[-1])
-        current_maggot_str = number_to_beautiful(supply_maggot[-1])
-        caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
-
-        context.bot.send_photo(chat_id=chat_id,
-                               photo=open(chart_supply_file_path, 'rb'),
-                               caption=caption,
-                               parse_mode="html")
-
-    elif len(query_received) > 3 or len(query_received) == 2:
-        context.bot.send_message(chat_id=chat_id,
-                                 text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
+    global last_time_checked
+    
+    new_time = round(time.time())
+    if new_time - last_time_checked > 60:
+        last_time_checked = new_time
+        list_time_supply = []
+    
+        with open(supply_file_path, newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in spamreader:
+                list_time_supply.append((row[0], row[1], row[2]))
+    
+        query_received = update.message.text.split(' ')
+        if len(query_received) == 1:
+            dates_pure = keep_dates(list_time_supply)
+    
+            supply_rot = [int(value[1]) for value in list_time_supply]
+            supply_maggot = [int(value[2]) for value in list_time_supply]
+    
+            print_chart_supply(dates_pure, supply_rot, supply_maggot)
+            current_rot_str = number_to_beautiful(supply_rot[-1])
+            current_maggot_str = number_to_beautiful(supply_maggot[-1])
+            caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
+    
+            context.bot.send_photo(chat_id=chat_id,
+                                   photo=open(chart_supply_file_path, 'rb'),
+                                   caption=caption,
+                                   parse_mode="html")
+    
+        elif len(query_received) > 3 or len(query_received) == 2:
+            context.bot.send_message(chat_id=chat_id,
+                                     text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
+        else:
+    
+            time_type, time_start, k_hours, k_days = get_from_query(query_received)
+    
+            now = datetime.utcnow()
+    
+            filtered_values = [x for x in list_time_supply if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+    
+            dates_pure = keep_dates(filtered_values)
+            supply_rot = [int(value[1]) for value in filtered_values]
+            supply_maggot = [int(value[2]) for value in filtered_values]
+    
+            print_chart_supply(dates_pure, supply_rot, supply_maggot)
+            current_rot_str = number_to_beautiful(supply_rot[-1])
+            current_maggot_str = number_to_beautiful(supply_maggot[-1])
+            caption = "Supply of the last " + str(time_start) + str(
+                time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
+    
+            context.bot.send_photo(chat_id=chat_id,
+                                   photo=open(chart_supply_file_path, 'rb'),
+                                   caption=caption,
+                                   parse_mode="html")
     else:
-
-        time_type, time_start, k_hours, k_days = get_from_query(query_received)
-
-        now = datetime.utcnow()
-
-        filtered_values = [x for x in list_time_supply if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
-
-        dates_pure = keep_dates(filtered_values)
-        supply_rot = [int(value[1]) for value in filtered_values]
-        supply_maggot = [int(value[2]) for value in filtered_values]
-
-        print_chart_supply(dates_pure, supply_rot, supply_maggot)
-        current_rot_str = number_to_beautiful(supply_rot[-1])
-        current_maggot_str = number_to_beautiful(supply_maggot[-1])
-        caption = "Supply of the last " + str(time_start) + str(
-            time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
-
-        context.bot.send_photo(chat_id=chat_id,
-                               photo=open(chart_supply_file_path, 'rb'),
-                               caption=caption,
-                               parse_mode="html")
-
-
+        context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
     dp = updater.dispatcher
@@ -789,7 +797,7 @@ def main():
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(CommandHandler('candlestick', get_candlestick_pyplot))
-    dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
+    # dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
     RepeatedTimer(15, log_current_price_rot_per_usd)
     RepeatedTimer(15, log_current_supply)
     updater.start_polling()
