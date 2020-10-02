@@ -457,7 +457,7 @@ def check_new_proposal(update: Update, context: CallbackContext):
     global last_time_checked
     new_time = round(time.time())
     if new_time - last_time_checked > 60:
-        #print("Checking for new proposals...")
+        # print("Checking for new proposals...")
         # log_current_price_rot_per_usd()
         # log_current_supply()
         last_time_checked = new_time
@@ -477,6 +477,10 @@ def check_new_proposal(update: Update, context: CallbackContext):
         #                       + telegram_governance_url
         #             print("New proposal found and sent")
         #             context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
+
+
+def strp_date(raw_date):
+    return datetime.strptime(raw_date, '%m/%d/%Y,%H:%M:%S')
 
 
 # util for get_chart_pyplot
@@ -567,14 +571,16 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
     else:
         time_type = query_received[2]
         time_start = int(query_received[1])
-        multiplier = 1
+        k_hours = 0
+        k_days = 0
         if time_type == 'h' or time_type == 'H':
-            multiplier = 60
+            k_hours = time_start
         if time_type == 'd' or time_type == 'D':
-            multiplier = 1440
+            k_days = time_start
 
-        start_range = int(time_start * multiplier)
-        filtered_values = list_time_price[-start_range: -1]
+        now = datetime.utcnow()
+
+        filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
 
         dates_pure = keep_dates(filtered_values)
         price = [float(value[1]) for value in filtered_values]
