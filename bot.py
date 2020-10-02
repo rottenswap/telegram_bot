@@ -51,7 +51,9 @@ api_proposal_url = 'https://rotapi.xyz/governance/getProposals'
 last_proposal_received_id = -1
 telegram_governance_url = 't.me/rottengovernance'
 rotten_main_chat_id = -1001382715556
-last_time_checked = round(time.time())
+last_time_checked_price_chart = round(time.time())
+last_time_checked_price_candles = round(time.time())
+last_time_checked_price_supply = round(time.time())
 
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting')
 
@@ -565,19 +567,20 @@ def print_chart_supply(dates_raw, supply_rot, supply_maggot):
 
 def get_chart_price_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    global last_time_checked
+    global last_time_checked_price_chart
 
     query_received = update.message.text.split(' ')
     if update.message.from_user.first_name == 'Ben':
         print("hello me")
-        last_time_checked = 1
+        last_time_checked_price_chart = 1
 
     time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
 
     if query_ok:
         new_time = round(time.time())
-        if new_time - last_time_checked > 60:
-            last_time_checked = new_time
+        if new_time - last_time_checked_price_chart > 60:
+            if update.message.from_user.first_name != 'Ben':
+                last_time_checked_price_chart = new_time
             list_time_price = []
 
             with open(price_file_path, newline='') as csvfile:
@@ -685,19 +688,20 @@ def check_query(query_received):
 
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    global last_time_checked
+    global last_time_checked_price_candles
 
     query_received = update.message.text.split(' ')
     if update.message.from_user.first_name == 'Ben':
         print("hello me")
-        last_time_checked = 1
+        last_time_checked_price_candles = 1
 
     time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
 
     if query_ok:
         new_time = round(time.time())
-        if new_time - last_time_checked > 60:
-            last_time_checked = new_time
+        if new_time - last_time_checked_price_candles > 60:
+            if update.message.from_user.first_name != 'Ben':
+                last_time_checked_price_candles = new_time
             list_time_price = []
 
             with open(price_file_path, newline='') as csvfile:
@@ -730,19 +734,20 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
 
 def get_chart_supply_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    global last_time_checked
+    global last_time_checked_price_supply
 
     query_received = update.message.text.split(' ')
     if update.message.from_user.first_name == 'Ben':
         print("hello me")
-        last_time_checked = 1
+        last_time_checked_price_supply = 1
 
     time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
 
     if query_ok:
         new_time = round(time.time())
-        if new_time - last_time_checked > 60:
-            last_time_checked = new_time
+        if new_time - last_time_checked_price_supply > 60:
+            if update.message.from_user.first_name != 'Ben':
+                last_time_checked_price_supply = new_time
             list_time_supply = []
 
             with open(supply_file_path, newline='') as csvfile:
