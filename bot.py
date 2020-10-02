@@ -481,6 +481,20 @@ def check_new_proposal(update: Update, context: CallbackContext):
         #             context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
 
 
+def get_from_query(query_received):
+    time_type = query_received[2]
+    time_start = int(query_received[1])
+    if time_start < 0:
+        time_start = - time_start
+    k_hours = 0
+    k_days = 0
+    if time_type == 'h' or time_type == 'H':
+        k_hours = time_start
+    if time_type == 'd' or time_type == 'D':
+        k_days = time_start
+    return time_type, time_start, k_hours, k_days
+
+
 def strp_date(raw_date):
     return datetime.strptime(raw_date, '%m/%d/%Y,%H:%M:%S')
 
@@ -676,15 +690,7 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
     else:
-        time_type = query_received[2]
-        time_start = int(query_received[1])
-        k_hours = 0
-        k_days = 0
-        if time_type == 'h' or time_type == 'H':
-            k_hours = time_start
-        if time_type == 'd' or time_type == 'D':
-            k_days = time_start
-
+        time_type, time_start, k_hours, k_days = get_from_query(query_received)
         now = datetime.utcnow()
 
         filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
@@ -731,14 +737,8 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchartsupply time type (example: /getchartsupply 3 h for the last 3h time range)")
     else:
-        time_type = query_received[2]
-        time_start = int(query_received[1])
-        k_hours = 0
-        k_days = 0
-        if time_type == 'h' or time_type == 'H':
-            k_hours = time_start
-        if time_type == 'd' or time_type == 'D':
-            k_days = time_start
+
+        time_type, time_start, k_hours, k_days = get_from_query(query_received)
 
         now = datetime.utcnow()
 
