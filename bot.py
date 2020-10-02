@@ -681,37 +681,41 @@ def print_candlelight(dates, openings, closes, highs, lows):
     plt.close()
 
 
+def check_query(query_received):
+    query_ok, simple_query = True, False
+    time_type, time_start, k_hours, k_days = 'd', 0, 0, 100
+    if len(query_received) == 1:
+        time_type, time_start, k_hours, k_days = get_from_query(query_received)
+    elif len(query_received) == 3:
+        simple_query = True
+    else:
+        query_ok = False
+    return time_type, time_start, k_hours, k_days, query_ok, simple_query
+
+
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     global last_time_checked
 
-    new_time = round(time.time())
-    if new_time - last_time_checked > 60:
-        last_time_checked = new_time
-        list_time_price = []
+    query_received = update.message.text.split(' ')
+    from_user = update.message.from_user
+    print('from_user = ' + from_user)
+    name = from_user.first_name
+    print(name)
 
-        with open(price_file_path, newline='') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-            for row in spamreader:
-                list_time_price.append((row[0], row[1]))
+    time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
 
-        query_received = update.message.text.split(' ')
-        if len(query_received) == 1:
-            resolution = 1
-            (dates, openings, closes, highs, lows) = transform_to_candelstick_format(list_time_price, resolution)
+    if query_ok:
+        new_time = round(time.time())
+        if new_time - last_time_checked > 60:
+            last_time_checked = new_time
+            list_time_price = []
 
-            print_candlelight(dates, openings, closes, highs, lows)
-            caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+            with open(price_file_path, newline='') as csvfile:
+                spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+                for row in spamreader:
+                    list_time_price.append((row[0], row[1]))
 
-            context.bot.send_photo(chat_id=chat_id,
-                                   photo=open(candels_file_path, 'rb'),
-                                   caption=caption,
-                                   parse_mode="html")
-        elif len(query_received) > 3 or len(query_received) == 2:
-            context.bot.send_message(chat_id=chat_id,
-                                     text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
-        else:
-            time_type, time_start, k_hours, k_days = get_from_query(query_received)
             now = datetime.utcnow()
 
             filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
@@ -719,15 +723,20 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
             (dates, openings, closes, highs, lows) = transform_to_candelstick_format(filtered_values, resolution)
 
             print_candlelight(dates, openings, closes, highs, lows)
-
-            caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+            if simple_query:
+                caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+            else:
+                caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
                                    caption=caption,
                                    parse_mode="html")
+        else:
+            context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
     else:
-        context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
+        context.bot.send_message(chat_id=chat_id,
+                                 text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
 
 
 def get_chart_supply_pyplot(update: Update, context: CallbackContext):
