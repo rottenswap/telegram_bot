@@ -19,6 +19,7 @@ import random
 import locale
 import os
 import json
+from bot_util import RepeatedTimer
 
 # ENV FILES
 etherscan_api_key = os.environ.get('ETH_API_KEY')
@@ -664,7 +665,8 @@ def main():
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
-
+    RepeatedTimer(1, log_current_price_rot_per_usd)
+    RepeatedTimer(1, log_current_supply)
     updater.start_polling()
     updater.idle()
 
