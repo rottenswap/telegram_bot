@@ -630,8 +630,11 @@ def chunks(lst, n):
 
 # date opening closing high low
 def transform_to_candelstick_format(list_values, resolution):
-    subvalues = chunks(list_values, 4*resolution)
-    print("len subvalues = " + str(len(subvalues)))
+
+    if len(list_values) > 600:
+        subvalues = chunks(list_values, 4*resolution*2)
+    else:
+        subvalues = chunks(list_values, 4*resolution)
     lst_dates = []
     lst_openings = []
     lst_closes = []
