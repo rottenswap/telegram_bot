@@ -778,6 +778,18 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
                                  text="Request badly formated. Please use /getchartsupply time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
 
 
+def get_airdrop(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    message = '''<a href = https://twitter.com/RottenSwap/status/1311624434038509568>As promised, here are the #airdrop details:
+- Follow us, like and RT this tweet (click me),
+- Join our TelegramGroup http://t.me/rottenswap,
+- Hold 7,500 $ROT tokens minimum at snapshot time (random time between 1st and 31st October),
+- Fill the form : https://docs.google.com/forms/d/1Zjb0m9tSpqkjG9qql6kuMNIBLU7_29kekDf4rVOrUS4</a>'''
+    context.bot.send_message(chat_id=chat_id,
+                             text=message,
+                             parse_mode='html')
+
+
 
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
@@ -798,6 +810,7 @@ def main():
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(CommandHandler('candlestick', get_candlestick_pyplot))
+    dp.add_handler(CommandHandler('airdrop', get_airdrop))
     # dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
     RepeatedTimer(15, log_current_price_rot_per_usd)
     RepeatedTimer(15, log_current_supply)
@@ -822,4 +835,5 @@ rot_price - Display a (simple) view of the $ROT price
 getchart - Display a (simple) price chart
 getchartsupply - Display a graph of the supply cap
 candlestick - Candlestick chart 
+aidrop - Info about the airdrop
 """
