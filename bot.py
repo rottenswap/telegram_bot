@@ -651,7 +651,7 @@ def print_candlelight(dates, openings, closes, highs, lows):
     plt.close()
 
 
-def get_candlelight_pyplot(update: Update, context: CallbackContext):
+def get_candlestick_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     list_time_price = []
 
@@ -666,7 +666,7 @@ def get_candlelight_pyplot(update: Update, context: CallbackContext):
         (dates, openings, closes, highs, lows) = transform_to_candelstick_format(list_time_price, resolution)
 
         print_candlelight(dates, openings, closes, highs, lows)
-        caption = "Candlelight chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+        caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
 
         context.bot.send_photo(chat_id=chat_id,
                                photo=open(candels_file_path, 'rb'),
@@ -778,7 +778,7 @@ def main():
     dp.add_handler(CommandHandler('getChartSupply', get_chart_supply_pyplot))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
-    dp.add_handler(CommandHandler('candelight', get_candlelight_pyplot))
+    dp.add_handler(CommandHandler('candlestick', get_candlestick_pyplot))
     dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
     RepeatedTimer(15, log_current_price_rot_per_usd)
     RepeatedTimer(15, log_current_supply)
@@ -802,5 +802,5 @@ add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
 getchart - Display a (simple) price chart
 getchartsupply - Display a graph of the supply cap
-candelight - Candelight chart 
+candlestick - Candlestick chart 
 """
