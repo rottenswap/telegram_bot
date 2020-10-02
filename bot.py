@@ -762,8 +762,6 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
                 for row in spamreader:
                     list_time_supply.append((row[0], row[1], row[2]))
 
-            time_type, time_start, k_hours, k_days = get_from_query(query_received)
-
             now = datetime.utcnow()
 
             filtered_values = [x for x in list_time_supply if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
@@ -787,7 +785,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
                                    parse_mode="html")
         else:
             context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
-    
+
 
 def main():
     updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
