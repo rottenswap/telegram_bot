@@ -563,28 +563,28 @@ def print_chart_supply(dates_raw, supply_rot, supply_maggot):
 
 def get_chart_price_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    
+
     global last_time_checked
 
     new_time = round(time.time())
     if new_time - last_time_checked > 60:
         last_time_checked = new_time
         list_time_price = []
-    
+
         with open(price_file_path, newline='') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
             for row in spamreader:
                 list_time_price.append((row[0], row[1]))
-    
+
         query_received = update.message.text.split(' ')
         if len(query_received) == 1:
             dates_pure = keep_dates(list_time_price)
-    
+
             price = [float(value[1]) for value in list_time_price]
-    
+
             print_chart_price(dates_pure, price)
             caption = "Chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
-    
+
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(chart_price_file_path, 'rb'),
                                    caption=caption,
@@ -601,18 +601,18 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
                 k_hours = time_start
             if time_type == 'd' or time_type == 'D':
                 k_days = time_start
-    
+
             now = datetime.utcnow()
-    
+
             filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
-    
+
             dates_pure = keep_dates(filtered_values)
             price = [float(value[1]) for value in filtered_values]
-    
+
             print_chart_price(dates_pure, price)
-    
+
             caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
-    
+
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(chart_price_file_path, 'rb'),
                                    caption=caption,
@@ -668,6 +668,9 @@ def print_candlelight(dates, openings, closes, highs, lows):
                                          low=lows,
                                          close=closes)])
     fig.update_layout(
+        autosize=False,
+        width=1600,
+        height=900,
         # title='Road to $.666',
         yaxis_title='ROT price (usdt)',
         xaxis_rangeslider_visible=False,
