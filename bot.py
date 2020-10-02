@@ -20,6 +20,7 @@ import locale
 import os
 import json
 from bot_util import RepeatedTimer
+import plotly.graph_objects as go
 
 # ENV FILES
 etherscan_api_key = os.environ.get('ETH_API_KEY')
@@ -40,6 +41,7 @@ price_file_path = '/home/debian/rot/log_files/price_hist.txt'
 supply_file_path = '/home/debian/rot/log_files/supply_hist.txt'
 chart_price_file_path = '/home/debian/rot/log_files/chart_price.png'
 chart_supply_file_path = '/home/debian/rot/log_files/chart_supply.png'
+candels_file_path = '/home/debian/rot/log_files/chart_candles.png'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
@@ -496,21 +498,6 @@ def keep_dates(values_list):
     return dates_datetime
 
 
-def filter_values(values_list, type, time_delta):
-
-    filtered_values = []
-    now = datetime.utcnow()
-
-    for value in values_list:
-        date = strp_date(value[0])
-        if now - date < time_delta:
-            if type == "price":
-                filtered_values.append((date, value[1]))
-            elif type == "supply":
-                filtered_values.append((date, value[1], value[2]))
-    return filtered_values
-
-
 def print_chart_price(dates_raw, price):
     dates = matplotlib.dates.date2num(dates_raw)
     cb91_green = '#47DBCD'
@@ -593,19 +580,123 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
         if time_type == 'd' or time_type == 'D':
             k_days = time_start
 
-        delta = timedelta(days=k_days, hours=k_hours)
-    
-        filtered_values = filter_values(list_time_price, "price", delta)
-    
-        dates_pure = [value[0] for value in filtered_values]        
+        now = datetime.utcnow()
+
+        filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+
+        dates_pure = keep_dates(filtered_values)
         price = [float(value[1]) for value in filtered_values]
-    
+
         print_chart_price(dates_pure, price)
 
         caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
 
         context.bot.send_photo(chat_id=chat_id,
                                photo=open(chart_price_file_path, 'rb'),
+                               caption=caption,
+                               parse_mode="html")
+
+
+def strp_date_candles(raw_date):
+    return datetime.strptime(raw_date[:-3], '%m/%d/%Y,%H:%M')
+
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    things = []
+    for i in range(0, len(lst) - 1, n):
+        second_part = [float(x[1]) for x in lst[i:i + n]]
+        date = strp_date_candles(lst[i][0])
+        things.append((date, second_part))
+    last_part = [float(x[1]) for x in lst[len(lst) - n:len(lst) - 1]]
+    last_date = strp_date_candles(lst[-1][0])
+    things.append((last_date, last_part))
+    return things
+
+
+# date opening closing high low
+def transform_to_candelstick_format(list_values, resolution):
+    subvalues = chunks(list_values, 4*resolution)
+    print("len subvalues = " + str(len(subvalues)))
+    lst_dates = []
+    lst_openings = []
+    lst_closes = []
+    lst_highs = []
+    lst_lows = []
+    for value_date_price in subvalues:
+        prices = value_date_price[1]
+        lst_dates.append(value_date_price[0])
+        lst_highs.append(max(prices))
+        lst_lows.append(min(prices))
+        lst_openings.append(prices[0])
+        if len(prices) >= 2:
+            lst_closes.append(prices[-1])
+        else:
+            lst_closes.append(prices[0])
+    return lst_dates, lst_openings, lst_closes, lst_highs, lst_lows
+
+
+def print_candlelight(dates, openings, closes, highs, lows):
+    fig = go.Figure(data=[go.Candlestick(x=dates,
+                                         open=openings,
+                                         high=highs,
+                                         low=lows,
+                                         close=closes)])
+    fig.update_layout(
+        #title='Road to $.666',
+        yaxis_title='ROT price (usdt)',
+        xaxis_rangeslider_visible=False
+    )
+    fig.write_image(candels_file_path, scale=4)
+    plt.close()
+
+
+def get_candlelight_pyplot(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    list_time_price = []
+
+    with open(price_file_path, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            list_time_price.append((row[0], row[1]))
+
+    query_received = update.message.text.split(' ')
+    if len(query_received) == 1:
+        resolution = 1
+        (dates, openings, closes, highs, lows) = transform_to_candelstick_format(list_time_price, resolution)
+
+        print_candlelight(dates, openings, closes, highs, lows)
+        caption = "Candlelight chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(candels_file_path, 'rb'),
+                               caption=caption,
+                               parse_mode="html")
+    elif len(query_received) > 3 or len(query_received) == 2:
+        context.bot.send_message(chat_id=chat_id,
+                                 text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
+    else:
+        time_type = query_received[2]
+        time_start = int(query_received[1])
+        k_hours = 0
+        k_days = 0
+        if time_type == 'h' or time_type == 'H':
+            k_hours = time_start
+        if time_type == 'd' or time_type == 'D':
+            k_days = time_start
+
+        now = datetime.utcnow()
+
+        filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+        resolution = 1
+        (dates, openings, closes, highs, lows) = transform_to_candelstick_format(filtered_values, resolution)
+
+        print_candlelight(dates, openings, closes, highs, lows)
+
+        caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(candels_file_path, 'rb'),
                                caption=caption,
                                parse_mode="html")
 
@@ -648,12 +739,12 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
             k_hours = time_start
         if time_type == 'd' or time_type == 'D':
             k_days = time_start
-        
-        delta = timedelta(days=k_days, hours=k_hours)
 
-        filtered_values = filter_values(list_time_supply, "supply", delta)
+        now = datetime.utcnow()
 
-        dates_pure = [value[0] for value in filtered_values]
+        filtered_values = [x for x in list_time_supply if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+
+        dates_pure = keep_dates(filtered_values)
         supply_rot = [int(value[1]) for value in filtered_values]
         supply_maggot = [int(value[2]) for value in filtered_values]
 
@@ -687,9 +778,10 @@ def main():
     dp.add_handler(CommandHandler('getChartSupply', get_chart_supply_pyplot))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
+    dp.add_handler(CommandHandler('candelight', get_candlelight_pyplot))
     dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
-    RepeatedTimer(60, log_current_price_rot_per_usd)
-    RepeatedTimer(60, log_current_supply)
+    RepeatedTimer(15, log_current_price_rot_per_usd)
+    RepeatedTimer(15, log_current_supply)
     updater.start_polling()
     updater.idle()
 
@@ -709,4 +801,6 @@ twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 rot_price - Display a (simple) view of the $ROT price
 getchart - Display a (simple) price chart
+getchartsupply - Display a graph of the supply cap
+candelight - Candelight chart 
 """
