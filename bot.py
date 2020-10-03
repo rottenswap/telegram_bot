@@ -32,6 +32,7 @@ ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_SECRET_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 MEME_GIT_REPO = os.environ.get('MEME_GIT_REPO')
 TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
+BASE_PATH = os.environ.get('BASE_PATH')
 
 test_error_token = "Looks like you need to either: increase slippage (see /howtoslippage) and/or remove the decimals from the amount of ROT you're trying to buy"
 
@@ -41,11 +42,11 @@ req_graphql_usdt = '''{token(id: "0xdac17f958d2ee523a2206206994597c13d831ec7") {
 graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 
 # log_file
-price_file_path = '/home/debian/rot/log_files/price_hist.txt'
-supply_file_path = '/home/debian/rot/log_files/supply_hist.txt'
-chart_price_file_path = '/home/debian/rot/log_files/chart_price.png'
-chart_supply_file_path = '/home/debian/rot/log_files/chart_supply.png'
-candels_file_path = '/home/debian/rot/log_files/chart_candles.png'
+price_file_path = BASE_PATH + 'rot/log_files/price_hist.txt'
+supply_file_path = BASE_PATH + 'rot/log_files/supply_hist.txt'
+chart_price_file_path = BASE_PATH + 'rot/log_files/chart_price.png'
+chart_supply_file_path = BASE_PATH + 'rot/log_files/chart_supply.png'
+candels_file_path = BASE_PATH + 'rot/log_files/chart_candles.png'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
