@@ -620,13 +620,10 @@ def strp_date_candles(raw_date):
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     things = []
-    for i in range(0, len(lst) - 1, n):
+    for i in range(0, len(lst) - 1, n):  # avoiding the last values as it can lead to some bugs
         second_part = [float(x[1]) for x in lst[i:i + n]]
         date = strp_date_candles(lst[i][0])
         things.append((date, second_part))
-    last_part = [float(x[1]) for x in lst[len(lst) - n:len(lst) - 1]]
-    last_date = strp_date_candles(lst[-1][0])
-    things.append((last_date, last_part))
     return things
 
 
