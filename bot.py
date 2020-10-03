@@ -94,14 +94,22 @@ def create_href_str(url, message):
 
 
 links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\n' \
-            + '<b>Uniswap:</b> ' + create_href_str(url_uniswap_rot, "$ROT") + " " + create_href_str(url_uniswap_maggot, '$MAGGOT') + '\n' \
-            + '<b>Pools:</b> ' + create_href_str(url_uniswap_pool_rot_eht, 'ROT-ETH') + ' ' + create_href_str(url_uniswap_pool_rot_maggot, 'ROT-MAGGOT') + '\n' \
-            + '<b>Etherscan:</b> ' + create_href_str(url_etherscan_rot, '$ROT') + " " + create_href_str(url_etherscan_maggot, '$MAGGOT') + '\n' \
-            + '<b>Charts:</b> ' + create_href_str(url_astrotools_rot, 'Astrotools') + ' ' + create_href_str(url_dextools_rot, 'DexTools') + ' ' \
-            + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot, 'LiveCoinWatch') + ' ' + create_href_str(url_coinmarketcap, 'CoinMarketCap') + '\n' \
-            + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' +  create_href_str(url_reddit_rottenswap, 'Reddit') + '\n' \
-            + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2, 'RottenMerch') + '\n' \
-             + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
+        + '<b>Uniswap:</b> ' + create_href_str(url_uniswap_rot, "$ROT") + " " + create_href_str(url_uniswap_maggot,
+                                                                                                '$MAGGOT') + '\n' \
+        + '<b>Pools:</b> ' + create_href_str(url_uniswap_pool_rot_eht, 'ROT-ETH') + ' ' + create_href_str(
+    url_uniswap_pool_rot_maggot, 'ROT-MAGGOT') + '\n' \
+        + '<b>Etherscan:</b> ' + create_href_str(url_etherscan_rot, '$ROT') + " " + create_href_str(
+    url_etherscan_maggot, '$MAGGOT') + '\n' \
+        + '<b>Charts:</b> ' + create_href_str(url_astrotools_rot, 'Astrotools') + ' ' + create_href_str(
+    url_dextools_rot, 'DexTools') + ' ' \
+        + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot,
+                                                                                  'LiveCoinWatch') + ' ' + create_href_str(
+    url_coinmarketcap, 'CoinMarketCap') + '\n' \
+        + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' + create_href_str(
+    url_reddit_rottenswap, 'Reddit') + '\n' \
+        + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2,
+                                                                                                    'RottenMerch') + '\n' \
+        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
 
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
@@ -211,7 +219,7 @@ def get_biz(update: Update, context: CallbackContext):
     if new_time - last_time_checked_4chan > 60:
         last_time_checked_4chan = new_time
         threads_ids = get_biz_threads()
-    
+
         base_url = "boards.4channel.org/biz/thread/"
         message = """Plz go bump the /biz/ threads:
 """
@@ -226,7 +234,9 @@ def get_biz(update: Update, context: CallbackContext):
         else:
             context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True)
     else:
-        context.bot.send_message(chat_id=chat_id, text='Only checking 4chan/twitter/charts once per minute. Don\'t spam.')
+        context.bot.send_message(chat_id=chat_id,
+                                 text='Only checking 4chan/twitter/charts once per minute. Don\'t spam.')
+
 
 # sends the main links
 def get_links(update: Update, context: CallbackContext):
@@ -315,7 +325,9 @@ def get_last_tweets(update: Update, context: CallbackContext):
         chat_id = update.message.chat_id
         context.bot.send_message(chat_id=chat_id, text=full_message, parse_mode='html', disable_web_page_preview=True)
     else:
-        context.bot.send_message(chat_id=chat_id, text='Only checking 4chan/twitter/charts once per minute. Don\'t spam.')
+        context.bot.send_message(chat_id=chat_id,
+                                 text='Only checking 4chan/twitter/charts once per minute. Don\'t spam.')
+
 
 def download_image(update: Update, context: CallbackContext):
     image = context.bot.getFile(update.message.photo[-1])
@@ -325,6 +337,7 @@ def download_image(update: Update, context: CallbackContext):
     image.download(img_path)
     return img_path
 
+
 # ADD MEME or PERFORM OCR to see if request to increase slippage
 def handle_new_image(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
@@ -333,10 +346,10 @@ def handle_new_image(update: Update, context: CallbackContext):
         if caption == "/add_meme":
             try:
                 tmp_path = download_image(update, context)
-                hash = calculate_hash(tmp_path)
-                is_present = check_file_already_present(hash)
+                img_hash = calculate_hash(tmp_path)
+                is_present = check_file_already_present(img_hash)
                 if not is_present:
-                    filename = hash + '.jpg'
+                    filename = img_hash + '.jpg'
                     copy_file_to_git_meme_folder(tmp_path, filename)
                     add_file_to_git(filename)
                     context.bot.send_message(chat_id=chat_id, text="Got it boss!")
@@ -351,7 +364,7 @@ def handle_new_image(update: Update, context: CallbackContext):
                 ocr = Ocr(tmp_path)
                 text_in_ocr = ocr.start_ocr().replace('\n', ' ')
                 print("recognized text = " + text_in_ocr)
-                if 'transaction cannot succeed' and 'one of the tokens' in text_in_ocr:
+                if ('transaction cannot succeed' and 'one of the tokens' in text_in_ocr) or ('transaction will not succeed' and 'price movement or' in text_in_ocr):
                     context.bot.send_message(chat_id=chat_id, text=test_error_token)
             except IndexError:
                 pass
@@ -500,30 +513,29 @@ Con.Adr = 0xd04...9e2
 #     new_time = round(time.time())
 #     if new_time - last_time_checked > 60:
 #         pass
-        # print("Checking for new proposals...")
-        # log_current_price_rot_per_usd()
-        # log_current_supply()
-        # last_time_checked = new_time
-        # response_json = requests.get(api_proposal_url).json()
-        # if response_json != "" or response_json is not None:
-        #     last_proposal = response_json[-1]
-        #     id_last_proposal = last_proposal['id']
-        #     if last_proposal_received_id == -1:  # check if the bot just initialized
-        #         last_proposal_received_id = id_last_proposal
-        #     else:
-        #         if id_last_proposal > last_proposal_received_id:
-        #             last_proposal_received_id = id_last_proposal
-        #             proposal_title = last_proposal['title']
-        #             description = last_proposal['description']
-        #             message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
-        #                       + description + '\nGo vote at ' \
-        #                       + telegram_governance_url
-        #             print("New proposal found and sent")
-        #             context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
+# print("Checking for new proposals...")
+# log_current_price_rot_per_usd()
+# log_current_supply()
+# last_time_checked = new_time
+# response_json = requests.get(api_proposal_url).json()
+# if response_json != "" or response_json is not None:
+#     last_proposal = response_json[-1]
+#     id_last_proposal = last_proposal['id']
+#     if last_proposal_received_id == -1:  # check if the bot just initialized
+#         last_proposal_received_id = id_last_proposal
+#     else:
+#         if id_last_proposal > last_proposal_received_id:
+#             last_proposal_received_id = id_last_proposal
+#             proposal_title = last_proposal['title']
+#             description = last_proposal['description']
+#             message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
+#                       + description + '\nGo vote at ' \
+#                       + telegram_governance_url
+#             print("New proposal found and sent")
+#             context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
 
 
 def get_from_query(query_received):
-
     time_type = query_received[2]
     time_start = int(query_received[1])
     if time_start < 0:
@@ -626,7 +638,8 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
 
             now = datetime.utcnow()
 
-            filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+            filtered_values = [x for x in list_time_price if
+                               now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
 
             dates_pure = keep_dates(filtered_values)
             price = [float(value[1]) for value in filtered_values]
@@ -634,16 +647,19 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
             print_chart_price(dates_pure, price)
 
             if simple_query:
-                caption = "Chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
+                caption = "Chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(price[-1])[
+                                                                                                     0:10] + "</pre>"
             else:
-                caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(price[-1])[0:10] + "</pre>"
+                caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
+                    price[-1])[0:10] + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(chart_price_file_path, 'rb'),
                                    caption=caption,
                                    parse_mode="html")
         else:
-            context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
+            context.bot.send_message(chat_id=chat_id,
+                                     text="Displaying charts only once every minute. Don't abuse this function")
     else:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
@@ -666,9 +682,9 @@ def chunks(lst, n):
 # date opening closing high low
 def transform_to_candelstick_format(list_values, resolution):
     if len(list_values) > 600:
-        subvalues = chunks(list_values, 4*resolution*2)
+        subvalues = chunks(list_values, 4 * resolution * 2)
     else:
-        subvalues = chunks(list_values, 4*resolution)
+        subvalues = chunks(list_values, 4 * resolution)
     lst_dates = []
     lst_openings = []
     lst_closes = []
@@ -744,22 +760,26 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
 
             now = datetime.utcnow()
 
-            filtered_values = [x for x in list_time_price if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+            filtered_values = [x for x in list_time_price if
+                               now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
             resolution = 1
             (dates, openings, closes, highs, lows) = transform_to_candelstick_format(filtered_values, resolution)
 
             print_candlelight(dates, openings, closes, highs, lows)
             if simple_query:
-                caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+                caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(
+                    list_time_price[-1][1])[0:10] + "</pre>"
             else:
-                caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(list_time_price[-1][1])[0:10] + "</pre>"
+                caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
+                    list_time_price[-1][1])[0:10] + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
                                    caption=caption,
                                    parse_mode="html")
         else:
-            context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
+            context.bot.send_message(chat_id=chat_id,
+                                     text="Displaying charts only once every minute. Don't abuse this function")
     else:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /candlestick time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
@@ -790,7 +810,8 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
 
             now = datetime.utcnow()
 
-            filtered_values = [x for x in list_time_supply if now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
+            filtered_values = [x for x in list_time_supply if
+                               now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
 
             dates_pure = keep_dates(filtered_values)
             supply_rot = [int(value[1]) for value in filtered_values]
@@ -810,7 +831,8 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
                                    caption=caption,
                                    parse_mode="html")
         else:
-            context.bot.send_message(chat_id=chat_id, text="Displaying charts only once every minute. Don't abuse this function")
+            context.bot.send_message(chat_id=chat_id,
+                                     text="Displaying charts only once every minute. Don't abuse this function")
     else:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchartsupply time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
@@ -827,7 +849,6 @@ def get_airdrop(update: Update, context: CallbackContext):
                              text=message,
                              parse_mode='html',
                              disable_web_page_preview=True)
-
 
 
 def main():
