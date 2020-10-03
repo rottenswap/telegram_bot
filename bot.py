@@ -58,6 +58,8 @@ rotten_main_chat_id = -1001382715556
 last_time_checked_price_chart = round(time.time())
 last_time_checked_price_candles = round(time.time())
 last_time_checked_price_supply = round(time.time())
+last_time_checked_4chan = round(time.time())
+last_time_checked_twitter = round(time.time())
 
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting')
 
@@ -203,24 +205,28 @@ def get_biz_threads():
 
 # sends the current biz threads
 def get_biz(update: Update, context: CallbackContext):
-    threadsIds = get_biz_threads()
-
-    baseUrl = "boards.4channel.org/biz/thread/"
-    message = """Plz go bump the /biz/ threads:
+    global last_time_checked_4chan
+    chat_id = update.message.chat_id
+    new_time = round(time.time())
+    if new_time - last_time_checked_4chan > 60:
+        last_time_checked_4chan = new_time
+        threads_ids = get_biz_threads()
+    
+        base_url = "boards.4channel.org/biz/thread/"
+        message = """Plz go bump the /biz/ threads:
 """
-    for thread_id in threadsIds:
-        excerpt = thread_id[2] + " | " + thread_id[1]
-        message += baseUrl + str(thread_id[0]) + " -- " + excerpt[0: 100] + "[...] \n"
-    if not threadsIds:
-        chat_id = update.message.chat_id
-        meme_url = get_url_meme()
-        print("sent reminder 4chan /biz/")
-        meme_caption = "There hasn't been a Rotten /biz/ thread for a while. Plz go make one https://boards.4channel.org/biz/, here's a meme, go make one."
-        context.bot.send_photo(chat_id=chat_id, photo=meme_url, caption=meme_caption)
+        for thread_id in threads_ids:
+            excerpt = thread_id[2] + " | " + thread_id[1]
+            message += base_url + str(thread_id[0]) + " -- " + excerpt[0: 100] + "[...] \n"
+        if not threads_ids:
+            meme_url = get_url_meme()
+            print("sent reminder 4chan /biz/")
+            meme_caption = "There hasn't been a Rotten /biz/ thread for a while. Plz go make one https://boards.4channel.org/biz/, here's a meme, go make one."
+            context.bot.send_photo(chat_id=chat_id, photo=meme_url, caption=meme_caption)
+        else:
+            context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True)
     else:
-        chat_id = update.message.chat_id
-        context.bot.send_message(chat_id=chat_id, text=message, disable_web_page_preview=True)
-
+        context.bot.send_message(chat_id=chat_id, text='Only checking 4chan/twitter/charts once per minute. Don\'t spam.')
 
 # sends the main links
 def get_links(update: Update, context: CallbackContext):
@@ -293,17 +299,23 @@ def filter_tweets(all_tweets):
 
 
 def get_last_tweets(update: Update, context: CallbackContext):
-    results = query_tweets(False)
-    message = "<b>Normies are tweeting about ROT, go comment/like/RT:</b>\n"
-    rest_message = filter_tweets(results)
-    if rest_message == "":
-        print("empty tweets, fallback")
-        results = query_tweets(False)
-        rest_message = filter_tweets(results)
-    full_message = message + rest_message
+    global last_time_checked_twitter
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=full_message, parse_mode='html', disable_web_page_preview=True)
-
+    new_time = round(time.time())
+    if new_time - last_time_checked_twitter > 60:
+        last_time_checked_twitter = new_time
+        results = query_tweets(False)
+        message = "<b>Normies are tweeting about ROT, go comment/like/RT:</b>\n"
+        rest_message = filter_tweets(results)
+        if rest_message == "":
+            print("empty tweets, fallback")
+            results = query_tweets(False)
+            rest_message = filter_tweets(results)
+        full_message = message + rest_message
+        chat_id = update.message.chat_id
+        context.bot.send_message(chat_id=chat_id, text=full_message, parse_mode='html', disable_web_page_preview=True)
+    else:
+        context.bot.send_message(chat_id=chat_id, text='Only checking 4chan/twitter/charts once per minute. Don\'t spam.')
 
 def download_image(update: Update, context: CallbackContext):
     image = context.bot.getFile(update.message.photo[-1])
