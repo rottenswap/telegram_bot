@@ -20,6 +20,7 @@ import locale
 import os
 import json
 from bot_util import RepeatedTimer
+from images import Ocr
 import plotly.graph_objects as go
 import pprint
 
@@ -31,6 +32,8 @@ ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_SECRET_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 MEME_GIT_REPO = os.environ.get('MEME_GIT_REPO')
 TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
+
+test_error_token = "Looks like you need to either: increase slippage (see /howtoslippage) and/or remove the decimals from the amount of ROT you're trying to buy"
 
 # Graph QL requests
 req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
@@ -301,34 +304,54 @@ def get_last_tweets(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=chat_id, text=full_message, parse_mode='html', disable_web_page_preview=True)
 
 
-# ADD MEME
-def add_meme(update: Update, context: CallbackContext):
+def download_image(update: Update, context: CallbackContext):
+    image = context.bot.getFile(update.message.photo[-1])
+    file_id = str(image.file_id)
+    print("file_id: " + file_id)
+    img_path = MEME_GIT_REPO + '/memesFolder/' + file_id + ".png"
+    image.download(img_path)
+    return img_path
+
+# ADD MEME or PERFORM OCR to see if request to increase slippage
+def handle_new_image(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
     try:
         caption = update['message']['caption']
         if caption == "/add_meme":
             try:
-                image = context.bot.getFile(update.message.photo[-1])
-                file_id = str(image.file_id)
-                print("file_id: " + file_id)
-                tmp_path = MEME_GIT_REPO + '/memesFolder/' + file_id + ".png"
-                image.download(tmp_path)
+                tmp_path = download_image(update, context)
                 hash = calculate_hash(tmp_path)
                 is_present = check_file_already_present(hash)
                 if not is_present:
                     filename = hash + '.jpg'
                     copy_file_to_git_meme_folder(tmp_path, filename)
                     add_file_to_git(filename)
-                    chat_id = update.message.chat_id
                     context.bot.send_message(chat_id=chat_id, text="Got it boss!")
                 else:
-                    chat_id = update.message.chat_id
                     context.bot.send_message(chat_id=chat_id, text="Image already registered")
             except IndexError:
                 error_msg = "Adding image failed: no image provided. Make sure to send it as a file and not an image."
-                chat_id = update.message.chat_id
                 context.bot.send_message(chat_id=chat_id, text=error_msg)
+        else:
+            try:
+                tmp_path = download_image(update, context)
+                ocr = Ocr(tmp_path)
+                text_in_ocr = ocr.start_ocr()
+                print("recognized text = " + text_in_ocr)
+                if 'transaction cannot succeed' and 'one of the tokens' in text_in_ocr:
+                    context.bot.send_message(chat_id=chat_id, text=test_error_token)
+            except IndexError:
+                pass
     except KeyError:
-        a = 1
+        try:
+            tmp_path = download_image(update, context)
+            ocr = Ocr(tmp_path)
+            text_in_ocr = ocr.start_ocr()
+            print("recognized text = " + text_in_ocr)
+            if 'transaction cannot succeed' and 'one of the tokens' in text_in_ocr:
+                context.bot.send_message(chat_id=chat_id, text=test_error_token)
+        except IndexError:
+            pass
 
 
 def copy_file_to_git_meme_folder(path, hash_with_extension):
@@ -804,7 +827,7 @@ def main():
     dp.add_handler(CommandHandler('supplycap', get_supply_cap))
     dp.add_handler(CommandHandler('4biz', get_biz))
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
-    dp.add_handler(MessageHandler(Filters.photo, add_meme))
+    dp.add_handler(MessageHandler(Filters.photo, handle_new_image))
     dp.add_handler(CommandHandler('rot_price', get_price_simple))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
