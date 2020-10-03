@@ -258,7 +258,7 @@ def stake_command(update: Update, context: CallbackContext):
 ...
 See the full instructions on https://medium.com/@rotted_ben/how-to-stake-on-rottenswap-5c71bdf57390"""
     chat_id = update.message.chat_id
-    context.bot.send_message(chat_id=chat_id, text=text, parse_mode='html')
+    context.bot.send_message(chat_id=chat_id, text=text, parse_mode='html', disable_web_page_preview=True)
 
 
 last_time_since_check = 0
