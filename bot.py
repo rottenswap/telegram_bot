@@ -816,7 +816,7 @@ def main():
     dp.add_handler(CommandHandler('airdropinfo', get_airdrop))
     # dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
     RepeatedTimer(15, log_current_price_rot_per_usd)
-    RepeatedTimer(15, log_current_supply)
+    RepeatedTimer(60, log_current_supply)
     updater.start_polling()
     updater.idle()
 
