@@ -374,7 +374,7 @@ def handle_new_image(update: Update, context: CallbackContext):
             ocr = Ocr(tmp_path)
             text_in_ocr = ocr.start_ocr().replace('\n', ' ')
             print("recognized text = " + text_in_ocr)
-            if 'transaction cannot succeed' and 'one of the tokens' in text_in_ocr:
+            if ('transaction cannot succeed' and 'one of the tokens' in text_in_ocr) or ('transaction will not succeed' and 'price movement or' in text_in_ocr):
                 context.bot.send_message(chat_id=chat_id, text=test_error_token)
         except IndexError:
             pass
