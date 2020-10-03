@@ -336,7 +336,7 @@ def handle_new_image(update: Update, context: CallbackContext):
             try:
                 tmp_path = download_image(update, context)
                 ocr = Ocr(tmp_path)
-                text_in_ocr = ocr.start_ocr()
+                text_in_ocr = ocr.start_ocr().replace('\n', ' ')
                 print("recognized text = " + text_in_ocr)
                 if 'transaction cannot succeed' and 'one of the tokens' in text_in_ocr:
                     context.bot.send_message(chat_id=chat_id, text=test_error_token)
@@ -346,7 +346,7 @@ def handle_new_image(update: Update, context: CallbackContext):
         try:
             tmp_path = download_image(update, context)
             ocr = Ocr(tmp_path)
-            text_in_ocr = ocr.start_ocr()
+            text_in_ocr = ocr.start_ocr().replace('\n', ' ')
             print("recognized text = " + text_in_ocr)
             if 'transaction cannot succeed' and 'one of the tokens' in text_in_ocr:
                 context.bot.send_message(chat_id=chat_id, text=test_error_token)
