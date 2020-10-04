@@ -918,8 +918,8 @@ def main():
     dp.add_handler(CommandHandler('4biz', get_biz))
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
     dp.add_handler(MessageHandler(Filters.photo, handle_new_image))
-    dp.add_handler(CommandHandler('rot', get_price_rot))
-    dp.add_handler(CommandHandler('maggot', get_price_maggot))
+    dp.add_handler(CommandHandler('rot_price', get_price_rot))
+    # dp.add_handler(CommandHandler('maggot', get_price_maggot))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     dp.add_handler(CommandHandler('getChart', get_chart_price_pyplot))
@@ -939,8 +939,6 @@ if __name__ == '__main__':
     main()
 
 commands = """
-rot - Display the $ROT price
-maggot - Display the $MAGGOT price
 help - Technical issues? A question? Need help?
 rotme - Give me a random meme
 links - Main links
