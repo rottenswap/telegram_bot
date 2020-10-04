@@ -38,6 +38,7 @@ test_error_token = "Looks like you need to either: increase slippage (see /howto
 
 # Graph QL requests
 req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
+req_graphql_maggot = '''{token(id: "0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89") {derivedETH}}'''
 req_graphql_usdt = '''{token(id: "0xdac17f958d2ee523a2206206994597c13d831ec7") {derivedETH}}'''
 graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 
@@ -457,7 +458,7 @@ def delete_meme(update: Update, context: CallbackContext):
 
 # graphql queries
 
-def get_price_raw():
+def get_price_rot_raw():
     resp_rot = graphql_client.execute(req_graphql_rot)
     resp_usdt = graphql_client.execute(req_graphql_usdt)
 
@@ -472,8 +473,38 @@ def get_price_raw():
     return (eth_per_rot, dollar_per_rot)
 
 
-def get_price_simple(update: Update, context: CallbackContext):
-    (eth_per_rot, dollar_per_rot) = get_price_raw()
+def get_price_maggot_raw():
+    resp_maggot = graphql_client.execute(req_graphql_maggot)
+    resp_usdt = graphql_client.execute(req_graphql_usdt)
+
+    json_resp_rot = json.loads(resp_maggot)
+    json_resp_usdt = json.loads(resp_usdt)
+
+    eth_per_maggot = float(json_resp_rot['data']['token']['derivedETH'])
+    eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
+
+    dollar_per_maggot = eth_per_maggot / eth_per_usdt
+
+    return (eth_per_maggot, dollar_per_maggot)
+
+
+def get_price_maggot(update: Update, context: CallbackContext):
+    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
+
+    supply_cap_maggot = get_supply_cap_raw(maggot_contract)
+    supply_cat_pretty = number_to_beautiful(supply_cap_maggot)
+    market_cap = number_to_beautiful(int(float(supply_cap_maggot) * dollar_per_rot))
+
+    message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
+              + "\nUSD: $" + str(dollar_per_rot)[0:10] \
+              + "\nsupply cap: " + supply_cat_pretty \
+              + "\nmarket cap: $" + market_cap + "</pre>"
+    chat_id = update.message.chat_id
+    context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
+
+
+def get_price_rot(update: Update, context: CallbackContext):
+    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
 
     supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
@@ -489,7 +520,7 @@ def get_price_simple(update: Update, context: CallbackContext):
 
 def log_current_price_rot_per_usd():
     global price_file_path
-    (eth_per_rot, dollar_per_rot) = get_price_raw()
+    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
     with open(price_file_path, "a") as price_file:
         time_now = datetime.now()
         date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
@@ -887,7 +918,8 @@ def main():
     dp.add_handler(CommandHandler('4biz', get_biz))
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
     dp.add_handler(MessageHandler(Filters.photo, handle_new_image))
-    dp.add_handler(CommandHandler('rot_price', get_price_simple))
+    dp.add_handler(CommandHandler('rot', get_price_rot))
+    dp.add_handler(CommandHandler('maggot', get_price_maggot))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     dp.add_handler(CommandHandler('getChart', get_chart_price_pyplot))
@@ -916,7 +948,8 @@ supplycap - How ROTTED are we
 4biz - List biz thread
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
-rot_price - Display a (simple) view of the $ROT price
+rot - Display the $ROT price
+maggot - Display the $MAGGOT price
 getchart - Display a (simple) price chart
 getchartsupply - Display a graph of the supply cap
 candlestick - Candlestick chart 
