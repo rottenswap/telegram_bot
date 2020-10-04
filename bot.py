@@ -1,7 +1,7 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, BaseFilter, \
     CallbackContext, Filters
 from telegram import Update
-from twython import Twython
+from twython import Twython, TwythonError
 from graphqlclient import GraphQLClient
 from PIL import Image
 from git import Repo
@@ -335,7 +335,11 @@ def get_last_tweets(update: Update, context: CallbackContext):
     new_time = round(time.time())
     if new_time - last_time_checked_twitter > 60:
         last_time_checked_twitter = new_time
-        results = query_tweets(False)
+        try:
+            results = query_tweets(False)
+        except TwythonError:
+            time.sleep(0.5)
+            results = query_tweets(False)
         message = "<b>Normies are tweeting about ROT, go comment/like/RT:</b>\n"
         rest_message = filter_tweets(results)
         if rest_message == "":
