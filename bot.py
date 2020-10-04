@@ -71,6 +71,27 @@ how_many_tweets = 5
 rot_contract = '0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
 maggot_contract = '0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89'
 
+# messages
+rot_101_text = '''<br>ROT IN A NUTSHELL
+
+$ROT is a deflationary token. 
+In each $ROT transaction 2.5% is burned into $MAGGOTS. 
+
+> IF the transaction is BUY:
+The 2.5% will be converted into MAGGOTS and deposited into your wallet.
+
+> IF the transaction is SELL:
+The 2.5% will be converted into MAGGOTS and deposited in the $MAGGOT warehouse. Basically, when you sell, 2.5% of $ROT is burned, but you don't get $MAGGOT.
+
+> DEFLATION VS. INFLATION
+$ROT is a deflationary token. Pools generate 100 new ROTs in each block.If there are enough buy/sell transactions of $ROT, even if 100ROT/block are created, it will still be deflationary. 
+
+If there are enough buy/sell transactions of $ROT, even if 100ROT/block are created, $ROT will still be deflationary. 
+
+If there were not enough transactions, $ROT would increase its amount. 
+
+The $MAGGOTS are inflationary. These tokens are initially worthless but now have some value due to the liquidity of the pools. $MAGGOT is usually used to stake the ROT-MAGGOT pair or to exchange them for $ROT, but you can do with them whatever you want.'''
+
 url_website = 'rottenswap.org'
 url_uniswap_rot = 'https://app.uniswap.org/#/swap?inputCurrency=0xd04785c4d8195e4a54d9dec3a9043872875ae9e2'
 url_uniswap_maggot = 'https://app.uniswap.org/#/swap?inputCurrency=0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89'
@@ -393,7 +414,7 @@ def add_file_to_git(filename):
     index.add(MEME_GIT_REPO + "/memesFolder/" + filename)
     index.commit("adding dank meme " + filename)
     origin = repo.remote('origin')
-    origin.push()
+    origin.push(force=True)
 
 
 # Returns True if the file is already present in the MEME_GIT_REPO directory
@@ -423,7 +444,7 @@ def delete_meme(update: Update, context: CallbackContext):
                 index.remove(MEME_GIT_REPO + "/memesFolder/" + filename)
                 index.commit("adding dank meme " + filename)
                 origin = repo.remote('origin')
-                origin.push()
+                origin.push(force=True)
                 os.remove(MEME_GIT_REPO + "/memesFolder/" + filename)
                 print("deleting meme " + to_delete)
                 chat_id = update.message.chat_id
