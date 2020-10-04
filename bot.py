@@ -485,18 +485,18 @@ def get_price_maggot_raw():
 
     dollar_per_maggot = eth_per_maggot / eth_per_usdt
 
-    return (eth_per_maggot, dollar_per_maggot)
+    return eth_per_maggot, dollar_per_maggot
 
 
 def get_price_maggot(update: Update, context: CallbackContext):
-    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
+    (eth_per_maggot, dollar_per_maggot) = get_price_maggot_raw()
 
     supply_cap_maggot = get_supply_cap_raw(maggot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_maggot)
-    market_cap = number_to_beautiful(int(float(supply_cap_maggot) * dollar_per_rot))
+    market_cap = number_to_beautiful(int(float(supply_cap_maggot) * dollar_per_maggot))
 
-    message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
-              + "\nUSD: $" + str(dollar_per_rot)[0:10] \
+    message = "<pre>ETH: Ξ" + str(eth_per_maggot)[0:10] \
+              + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
               + "\nsupply cap: " + supply_cat_pretty \
               + "\nmarket cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
@@ -939,6 +939,8 @@ if __name__ == '__main__':
     main()
 
 commands = """
+rot - Display the $ROT price
+maggot - Display the $MAGGOT price
 help - Technical issues? A question? Need help?
 rotme - Give me a random meme
 links - Main links
@@ -948,8 +950,6 @@ supplycap - How ROTTED are we
 4biz - List biz thread
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
-rot - Display the $ROT price
-maggot - Display the $MAGGOT price
 getchart - Display a (simple) price chart
 getchartsupply - Display a graph of the supply cap
 candlestick - Candlestick chart 
