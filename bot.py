@@ -493,7 +493,7 @@ def get_price_rot_raw():
 
 # return the amount of maggot per rot
 def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
-    
+
     pprint.pprint(last_swaps_maggot_rot_pair['data']['swaps'][0])
     interesting_part = last_swaps_maggot_rot_pair['data']['swaps'][0]
     last_swaps_amount_maggot_in = float(interesting_part['amount0In'])
@@ -516,8 +516,8 @@ def get_price_maggot_raw():
     (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
     print('rot per maggot: ' + str(rot_per_maggot))
     print('dollar per rot: ' + str(dollar_per_rot))
-    dollar_per_maggot = dollar_per_rot / rot_per_maggot
-    eth_per_maggot = eth_per_rot / rot_per_maggot
+    dollar_per_maggot = dollar_per_rot * rot_per_maggot
+    eth_per_maggot = eth_per_rot * rot_per_maggot
 
     return eth_per_maggot, dollar_per_maggot, rot_per_maggot
 
