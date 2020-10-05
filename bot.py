@@ -73,7 +73,6 @@ query_uni = '''query blocks {
         ethPrice
     }
 }
-
 '''
 
 req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
@@ -134,6 +133,7 @@ how_many_tweets = 5
 
 ## CONTRACT
 rot_contract = '0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
+rot_contract_formatted_uni = "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2"
 maggot_contract = '0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89'
 
 # messages
@@ -548,7 +548,7 @@ def get_price_rot_raw():
     block_from_1d = int(json_resp_eth['data']['t2'][0]['number'])
     latest_block = int(json_resp_eth['data']['tnow'][0]['number'])
 
-    query_uni_updated = query_uni.replace("CONTRACT", rot_contract) \
+    query_uni_updated = query_uni.replace("CONTRACT", rot_contract_formatted_uni) \
         .replace("NUMBER_T1", str(block_from_7d)) \
         .replace("NUMBER_T2", str(block_from_1d)) \
         .replace("NUMBER_TNOW", str(latest_block - 3))
