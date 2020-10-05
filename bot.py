@@ -563,7 +563,7 @@ def get_price_rot_raw():
     try:
         rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     except KeyError: # trying again
-        print("trying again to query QUERY_UNI")
+        print("trying again to query QUERY_UNI. Error: " + str(json_resp_uni))
         res_uni_query = graphql_client_uni.execute(query_uni_updated)
         json_resp_uni = json.loads(res_uni_query)
         rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
