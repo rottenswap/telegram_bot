@@ -556,6 +556,7 @@ def get_price_rot_raw():
     res_uni_query = graphql_client_uni.execute(query_uni_updated)
     json_resp_uni = json.loads(res_uni_query)
 
+    pprint.pprint(json_resp_uni)
     derivedETH_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     derivedETH_1d = float(json_resp_uni['data']['t2']['derivedETH'])
     derivedETH_now = float(json_resp_uni['data']['tnow']['derivedETH'])
