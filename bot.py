@@ -516,7 +516,7 @@ def get_price_maggot_raw():
 
     (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
 
-    dollar_per_maggot = rot_per_maggot / dollar_per_rot
+    dollar_per_maggot = dollar_per_rot / rot_per_maggot
     eth_per_maggot = eth_per_rot / rot_per_maggot
 
     return eth_per_maggot, dollar_per_maggot, rot_per_maggot
