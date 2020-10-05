@@ -34,6 +34,8 @@ MEME_GIT_REPO = os.environ.get('MEME_GIT_REPO')
 TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
 BASE_PATH = os.environ.get('BASE_PATH')
 
+gecko_rot_url = "https://api.coingecko.com/api/v3/coins/rotten/market_chart/range?vs_currency=usd&"
+
 test_error_token = "Looks like you need to either: increase slippage (see /howtoslippage) and/or remove the decimals from the amount of ROT you're trying to buy"
 
 # Graph QL requests
@@ -408,7 +410,8 @@ def handle_new_image(update: Update, context: CallbackContext):
                 ocr = Ocr(tmp_path)
                 text_in_ocr = ocr.start_ocr().replace('\n', ' ')
                 print("recognized text = " + text_in_ocr)
-                if ('transaction cannot succeed' and 'one of the tokens' in text_in_ocr) or ('transaction will not succeed' and 'price movement or' in text_in_ocr):
+                if ('transaction cannot succeed' and 'one of the tokens' in text_in_ocr) or (
+                        'transaction will not succeed' and 'price movement or' in text_in_ocr):
                     context.bot.send_message(chat_id=chat_id, text=test_error_token)
             except IndexError:
                 pass
@@ -418,7 +421,8 @@ def handle_new_image(update: Update, context: CallbackContext):
             ocr = Ocr(tmp_path)
             text_in_ocr = ocr.start_ocr().replace('\n', ' ')
             print("recognized text = " + text_in_ocr)
-            if ('transaction cannot succeed' and 'one of the tokens' in text_in_ocr) or ('transaction will not succeed' and 'price movement or' in text_in_ocr):
+            if ('transaction cannot succeed' and 'one of the tokens' in text_in_ocr) or (
+                    'transaction will not succeed' and 'price movement or' in text_in_ocr):
                 context.bot.send_message(chat_id=chat_id, text=test_error_token)
         except IndexError:
             pass
@@ -493,7 +497,6 @@ def get_price_rot_raw():
 
 # return the amount of maggot per rot
 def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
-
     pprint.pprint(last_swaps_maggot_rot_pair['data']['swaps'][0])
     interesting_part = last_swaps_maggot_rot_pair['data']['swaps'][0]
     last_swaps_amount_maggot_in = float(interesting_part['amount0In'])
@@ -537,15 +540,38 @@ def get_price_maggot(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
 
+# return price 7 days ago, price 1 day ago, volume last 24h
+def get_hist_prices_rot_from_gecko():
+    now = int(time.time())
+
+    before = now - 3600 * 24 * 7
+
+    url = gecko_rot_url + 'from=' + str(before) + '&to=' + str(now)
+
+    gecko_res = requests.get(url).json()
+    price_7d = gecko_res['prices'][0][1]
+    price_1d = gecko_res['prices'][-24][1]
+
+    vol_24h = gecko_res['total_volumes'][-1][1]
+
+    return (price_7d, price_1d, vol_24h)
+
+
 def get_price_rot(update: Update, context: CallbackContext):
     (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
 
     supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
+    (price_7d, price_1d, vol_24h) = get_hist_prices_rot_from_gecko
+    var_7d = int(((dollar_per_rot - price_7d) / dollar_per_rot) * 100)
+    var_1d = int(((dollar_per_rot - price_1d) / dollar_per_rot) * 100)
 
     message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
               + "\nUSD: $" + str(dollar_per_rot)[0:10] \
+              + "\n24H: $" + str(var_1d) \
+              + "\n7D : $" + str(var_7d) \
+              + "\n" \
               + "\nsupply cap: " + supply_cat_pretty \
               + "\nmarket cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
