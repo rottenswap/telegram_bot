@@ -577,8 +577,8 @@ def get_price_rot(update: Update, context: CallbackContext):
               + "\n24H: $" +var_1d_str \
               + "\n7D : $" + var_7d_str \
               + "\n" \
-              + "\nsupply cap: " + supply_cat_pretty \
-              + "\nmarket cap: $" + market_cap + "</pre>"
+              + "\nS. Cap: " + supply_cat_pretty \
+              + "\nM. Cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
