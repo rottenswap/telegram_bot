@@ -614,7 +614,7 @@ def get_price_maggot(update: Update, context: CallbackContext):
               + "\nS. Cap: " + supply_cat_pretty \
               + "\nM. Cap: $" + market_cap \
               + "\nHolders = " + str(holders) + "</code>"
-    
+
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
