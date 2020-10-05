@@ -104,6 +104,7 @@ req_graphql_vol24h_rot = '''{
 
 
 graphql_client_uni = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+graphql_client_uni_2 = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 graphql_client_eth = GraphQLClient('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks')
 
 # log_file
@@ -627,7 +628,7 @@ def get_volume_24h_rot():
     now = int(time.time())
     yesterday = now - 3600 * 24
     print(str(yesterday))
-    res = graphql_client_uni.execute(req_graphql_vol24h_rot.replace("TIMESTAMP_MINUS_24_H", str(yesterday)))
+    res = graphql_client_uni_2.execute(req_graphql_vol24h_rot.replace("TIMESTAMP_MINUS_24_H", str(yesterday)))
 
     json_resp_eth = json.loads(res)
 
