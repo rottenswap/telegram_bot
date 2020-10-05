@@ -493,10 +493,11 @@ def get_price_rot_raw():
 
 # return the amount of maggot per rot
 def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
-    last_swaps_amount_maggot_in = float(last_swaps_maggot_rot_pair['amount0In'])
-    last_swaps_amount_maggot_out = float(last_swaps_maggot_rot_pair['amount0Out'])
-    last_swaps_amount_rot_in = float(last_swaps_maggot_rot_pair['amount1In'])
-    last_swaps_amount_rot_out = float(last_swaps_maggot_rot_pair['amount1Out'])
+    interesting_part = last_swaps_maggot_rot_pair['data']['swaps'][0]
+    last_swaps_amount_maggot_in = float(interesting_part['amount0In'])
+    last_swaps_amount_maggot_out = float(interesting_part['amount0Out'])
+    last_swaps_amount_rot_in = float(interesting_part['amount1In'])
+    last_swaps_amount_rot_out = float(interesting_part['amount1Out'])
     # check which direction the transaction took place. For that, if amount1In = 0, it was maggot -> rot
     transaction_direction_maggot_to_rot = (last_swaps_amount_rot_in == 0)
     if transaction_direction_maggot_to_rot:
@@ -507,7 +508,7 @@ def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
 
 def get_price_maggot_raw():
     resp_maggot = graphql_client.execute(req_graphql_maggot)
-
+    
     rot_per_maggot = get_ratio_rot_per_maggot(resp_maggot)
 
     (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
