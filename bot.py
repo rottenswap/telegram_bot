@@ -558,7 +558,7 @@ def get_price_rot_raw():
     res_uni_query = graphql_client_uni.execute(query_uni_updated)
     json_resp_uni = json.loads(res_uni_query)
 
-    pprint.pprint(json_resp_uni)
+    # pprint.pprint(json_resp_uni)
 
     rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     rot_per_eth_1d = float(json_resp_uni['data']['t2']['derivedETH'])
@@ -634,12 +634,12 @@ def get_volume_24h_rot():
 
     json_resp_eth = json.loads(res)
 
-    pprint.pprint(res)
+    # pprint.pprint(res)
 
-    allValues = json_resp_eth['data']['pairHourDatas']
+    all_values = json_resp_eth['data']['pairHourDatas']
 
     amount = 0
-    for value in allValues:
+    for value in all_values:
         amount += round(float(value['hourlyVolumeUSD']))
 
     return amount
