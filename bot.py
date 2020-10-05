@@ -514,8 +514,7 @@ def get_price_maggot_raw():
     rot_per_maggot = get_ratio_rot_per_maggot(json.loads(resp_maggot))
 
     (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
-    print('rot per maggot: ' + str(rot_per_maggot))
-    print('dollar per rot: ' + str(dollar_per_rot))
+
     dollar_per_maggot = dollar_per_rot * rot_per_maggot
     eth_per_maggot = eth_per_rot * rot_per_maggot
 
@@ -974,6 +973,8 @@ if __name__ == '__main__':
     main()
 
 commands = """
+rot - Display the $ROT price
+maggot - Display the $MAGGOT price
 help - Technical issues? A question? Need help?
 rotme - Give me a random meme
 links - Main links
