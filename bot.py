@@ -625,7 +625,7 @@ def get_volume_24h_rot():
     res = graphql_client_uni.execute(req_graphql_vol24h_rot)
     json_resp_eth = json.loads(res)
 
-    volume = round(json_resp_eth['data']['pair']['volumeUSD'])
+    volume = round(float(json_resp_eth['data']['pair']['volumeUSD']))
 
     return volume
 
