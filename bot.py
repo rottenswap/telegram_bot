@@ -34,6 +34,8 @@ MEME_GIT_REPO = os.environ.get('MEME_GIT_REPO')
 TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
 BASE_PATH = os.environ.get('BASE_PATH')
 
+ethexplorer_holder_base_url = "https://ethplorer.io/service/service.php?data="
+
 gecko_rot_url = "https://api.coingecko.com/api/v3/coins/rotten/market_chart/range?vs_currency=usd&"
 
 test_error_token = "Looks like you need to either: increase slippage (see /howtoslippage) and/or remove the decimals from the amount of ROT you're trying to buy"
@@ -478,6 +480,12 @@ def delete_meme(update: Update, context: CallbackContext):
                 context.bot.send_message(chat_id=chat_id, text="removed" + filename)
 
 
+def get_number_holder_token(token):
+    url = ethexplorer_holder_base_url + token
+    res = requests.get(url).json()
+    holders = res['pager']['holders']['records']
+    return int(holders)
+
 # graphql queries
 
 def get_price_rot_raw():
@@ -497,7 +505,6 @@ def get_price_rot_raw():
 
 # return the amount of maggot per rot
 def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
-    pprint.pprint(last_swaps_maggot_rot_pair['data']['swaps'][0])
     interesting_part = last_swaps_maggot_rot_pair['data']['swaps'][0]
     last_swaps_amount_maggot_in = float(interesting_part['amount0In'])
     last_swaps_amount_maggot_out = float(interesting_part['amount0Out'])
@@ -564,6 +571,7 @@ def get_price_rot(update: Update, context: CallbackContext):
     supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
+
     (price_7d, price_1d, vol_24h) = get_hist_prices_rot_from_gecko()
     var_7d = int(((dollar_per_rot - price_7d) / dollar_per_rot) * 100)
     var_1d = int(((dollar_per_rot - price_1d) / dollar_per_rot) * 100)
@@ -571,6 +579,9 @@ def get_price_rot(update: Update, context: CallbackContext):
     var_7d_str = "+" + str(var_7d) + "%" if var_7d > 0 else str(var_7d) + "%"
     var_1d_str = "+" + str(var_1d) + "%" if var_1d > 0 else str(var_1d) + "%"
 
+    vol_24_pretty = number_to_beautiful(vol_24h)
+
+    holders = get_number_holder_token(rot_contract)
 
 
     message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
@@ -578,8 +589,10 @@ def get_price_rot(update: Update, context: CallbackContext):
               + "\n24H:  " + var_1d_str \
               + "\n7D :  " + var_7d_str \
               + "\n" \
-              + "\nS. Cap: " + supply_cat_pretty \
-              + "\nM. Cap: $" + market_cap + "</pre>"
+              + "\nHolders = " + str(holders) \
+              + "\nVol 24H = $" + vol_24_pretty \
+              + "\nS.  Cap = " + supply_cat_pretty \
+              + "\nM.  Cap = $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
