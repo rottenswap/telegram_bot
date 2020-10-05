@@ -606,13 +606,15 @@ def get_price_maggot(update: Update, context: CallbackContext):
 
     holders = get_number_holder_token(maggot_contract)
 
-    message = "<pre>ETH: Ξ" + str(eth_per_maggot)[0:10] \
+    message = "<code>(ROT) RottenToken" \
+              + "ETH: Ξ" + str(eth_per_maggot)[0:10] \
               + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
               + "\nROT: R" + str(rot_per_maggot)[0:10] \
               + "\n" \
-              + "\nHolders = " + str(holders) \
               + "\nS. Cap: " + supply_cat_pretty \
-              + "\nM. Cap: $" + market_cap + "</pre>"
+              + "\nM. Cap: $" + market_cap \
+              + "\nHolders = " + str(holders) + "</code>"
+    
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
@@ -646,15 +648,16 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     holders = get_number_holder_token(rot_contract)
 
-    message = "<pre>ETH: Ξ" + str(derivedETH_now)[0:10] \
+    message = "<code>(MAGGOT) MaggotToken" \
+              + "ETH: Ξ" + str(derivedETH_now)[0:10] \
               + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
               + "\n24H:  " + var_1d_str \
               + "\n7D :  " + var_7d_str \
               + "\n" \
-              + "\nHolders = " + str(holders) \
               + "\nVol 24H = $" + vol_24_pretty \
               + "\nS.  Cap = " + supply_cat_pretty \
-              + "\nM.  Cap = $" + market_cap + "</pre>"
+              + "\nM.  Cap = $" + market_cap \
+              + "\nHolders = " + str(holders) + "</code>"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
