@@ -567,9 +567,9 @@ def get_price_rot(update: Update, context: CallbackContext):
     var_7d = int(((dollar_per_rot - price_7d) / dollar_per_rot) * 100)
     var_1d = int(((dollar_per_rot - price_1d) / dollar_per_rot) * 100)
 
-    var_7d_str = "+" + str(var_7d) + "%" if var_7d > 0 else "+" + str(var_7d) + "%"
-    var_1d_str = "+" + str(var_1d) + "%" if var_1d > 0 else "+" + str(var_1d) + "%"
-    
+    var_7d_str = "+" + str(var_7d) + "%" if var_7d > 0 else str(var_7d) + "%"
+    var_1d_str = "+" + str(var_1d) + "%" if var_1d > 0 else str(var_1d) + "%"
+
 
 
     message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
