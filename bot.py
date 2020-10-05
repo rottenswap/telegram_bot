@@ -512,7 +512,7 @@ def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
 def get_price_maggot_raw():
     resp_maggot = graphql_client.execute(req_graphql_maggot)
 
-    rot_per_maggot = get_ratio_rot_per_maggot(resp_maggot)
+    rot_per_maggot = get_ratio_rot_per_maggot(json.loads(resp_maggot))
 
     (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
 
