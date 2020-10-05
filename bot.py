@@ -95,10 +95,13 @@ swaps(
  }}'''
 
 req_graphql_vol24h_rot = '''{
-	pair(id:"0x5a265315520696299fa1ece0701c3a1ba961b888") {
-    volumeUSD
-  }  
+  pairHourDatas(
+    where: {hourStartUnix_gt: TIMESTAMP_MINUS_"$_H, pair: "0x5a265315520696299fa1ece0701c3a1ba961b888"})
+    {
+    hourlyVolumeUSD
+  }
 }'''
+
 
 graphql_client_uni = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 graphql_client_eth = GraphQLClient('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks')
@@ -255,7 +258,7 @@ def get_supply_cap_raw(contract_addr):
 
 # convert int to nice string: 1234567 => 1.234.567
 def number_to_beautiful(nbr):
-    return locale.format_string("%d", nbr, grouping=True)
+    return locale.format_string("%d", nbr, grouping=True).replace(",", " ")
 
 
 # Get the supply cache from etherscan. Uses the ETH_API_KEY passed as an env variable.
@@ -621,12 +624,21 @@ def get_price_maggot(update: Update, context: CallbackContext):
 
 # return price 7 days ago, price 1 day ago, volume last 24h
 def get_volume_24h_rot():
-    res = graphql_client_uni.execute(req_graphql_vol24h_rot)
+    now = int(time.time())
+    yesterday = now - 3600 * 24
+    res = graphql_client_uni.execute(req_graphql_vol24h_rot).replace("req_graphql_vol24h_rot", str(yesterday))
+
     json_resp_eth = json.loads(res)
 
-    volume = round(float(json_resp_eth['data']['pair']['volumeUSD']))
+    pprint.pprint(res)
 
-    return volume
+    allValues = json_resp_eth['data']['pairHourDatas']
+
+    amount = 0
+    for value in allValues:
+        amount += round(value['hourlyVolumeUSD'])
+
+    return amount
 
 
 def get_price_rot(update: Update, context: CallbackContext):
