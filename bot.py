@@ -36,8 +36,6 @@ BASE_PATH = os.environ.get('BASE_PATH')
 
 ethexplorer_holder_base_url = "https://ethplorer.io/service/service.php?data="
 
-gecko_rot_url = "https://api.coingecko.com/api/v3/coins/rotten/market_chart/range?vs_currency=usd&"
-
 test_error_token = "Looks like you need to either: increase slippage (see /howtoslippage) and/or remove the decimals from the amount of ROT you're trying to buy"
 
 # Graph QL requests
@@ -556,19 +554,18 @@ def get_price_rot_raw():
     res_uni_query = graphql_client_uni.execute(query_uni_updated)
     json_resp_uni = json.loads(res_uni_query)
 
-    pprint.pprint(json_resp_uni)
-    derivedETH_7d = float(json_resp_uni['data']['t1']['derivedETH'])
-    derivedETH_1d = float(json_resp_uni['data']['t2']['derivedETH'])
-    derivedETH_now = float(json_resp_uni['data']['tnow']['derivedETH'])
+    rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
+    rot_per_eth_1d = float(json_resp_uni['data']['t2']['derivedETH'])
+    rot_per_eth_now = float(json_resp_uni['data']['tnow']['derivedETH'])
     eth_price_7d = float(json_resp_uni['data']['b1']['ethPrice'])
     eth_price_1d = float(json_resp_uni['data']['b2']['ethPrice'])
     eth_price_now = float(json_resp_uni['data']['bnow']['ethPrice'])
 
-    rot_price_7d_usd = derivedETH_7d * eth_price_7d
-    rot_price_1d_usd = derivedETH_1d * eth_price_1d
-    rot_price_now_usd = derivedETH_now * eth_price_now
+    rot_price_7d_usd = rot_per_eth_7d * eth_price_7d
+    rot_price_1d_usd = rot_per_eth_1d * eth_price_1d
+    rot_price_now_usd = rot_per_eth_now * eth_price_now
 
-    return (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now, rot_price_now_usd)
+    return (rot_per_eth_7d, rot_price_7d_usd, rot_per_eth_1d, rot_price_1d_usd, rot_per_eth_now, rot_price_now_usd)
 
 
 # return the amount of maggot per rot
