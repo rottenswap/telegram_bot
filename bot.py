@@ -493,6 +493,9 @@ def get_price_rot_raw():
 
 # return the amount of maggot per rot
 def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
+    pprint.pprint(last_swaps_maggot_rot_pair['data'])
+    pprint.pprint(last_swaps_maggot_rot_pair['data']['swaps'])
+    pprint.pprint(last_swaps_maggot_rot_pair['data']['swaps'][0])
     interesting_part = last_swaps_maggot_rot_pair['data']['swaps'][0]
     last_swaps_amount_maggot_in = float(interesting_part['amount0In'])
     last_swaps_amount_maggot_out = float(interesting_part['amount0Out'])
@@ -508,7 +511,7 @@ def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
 
 def get_price_maggot_raw():
     resp_maggot = graphql_client.execute(req_graphql_maggot)
-    
+
     rot_per_maggot = get_ratio_rot_per_maggot(resp_maggot)
 
     (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
