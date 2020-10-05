@@ -606,7 +606,7 @@ def get_price_maggot(update: Update, context: CallbackContext):
 
     holders = get_number_holder_token(maggot_contract)
 
-    message = "<code>(ROT) RottenToken" \
+    message = "<code>(MAGGOT) MaggotToken" \
               + "\nETH: Ξ" + str(eth_per_maggot)[0:10] \
               + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
               + "\nROT: R" + str(rot_per_maggot)[0:10] \
@@ -648,7 +648,7 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     holders = get_number_holder_token(rot_contract)
 
-    message = "<code>(MAGGOT) MaggotToken" \
+    message = "<code>(ROT) RotToken" \
               + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
               + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
               + "\n24H:  " + var_1d_str \
