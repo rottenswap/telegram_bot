@@ -96,7 +96,7 @@ swaps(
 
 req_graphql_vol24h_rot = '''{
   pairHourDatas(
-    where: {hourStartUnix_gt: TIMESTAMP_MINUS_"$_H, pair: "0x5a265315520696299fa1ece0701c3a1ba961b888"})
+    where: {hourStartUnix_gt: TIMESTAMP_MINUS_24_H, pair: "0x5a265315520696299fa1ece0701c3a1ba961b888"})
     {
     hourlyVolumeUSD
   }
@@ -626,7 +626,7 @@ def get_price_maggot(update: Update, context: CallbackContext):
 def get_volume_24h_rot():
     now = int(time.time())
     yesterday = now - 3600 * 24
-    res = graphql_client_uni.execute(req_graphql_vol24h_rot).replace("req_graphql_vol24h_rot", str(yesterday))
+    res = graphql_client_uni.execute(req_graphql_vol24h_rot).replace("TIMESTAMP_MINUS_24_H", str(yesterday))
 
     json_resp_eth = json.loads(res)
 
