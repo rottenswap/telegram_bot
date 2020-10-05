@@ -609,7 +609,7 @@ def get_price_maggot(update: Update, context: CallbackContext):
     message = "<code>(MAGGOT) MaggotToken" \
               + "\nETH: Ξ" + str(eth_per_maggot)[0:10] \
               + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
-              + "\nROT: R" + str(rot_per_maggot)[0:10] \
+              + "\nROT: ®" + str(rot_per_maggot)[0:10] \
               + "\n" \
               + "\nS. Cap: " + supply_cat_pretty \
               + "\nM. Cap: $" + market_cap \
