@@ -538,10 +538,13 @@ def get_price_maggot(update: Update, context: CallbackContext):
     supply_cat_pretty = number_to_beautiful(supply_cap_maggot)
     market_cap = number_to_beautiful(int(float(supply_cap_maggot) * dollar_per_maggot))
 
+    holders = get_number_holder_token(maggot_contract)
+
     message = "<pre>ETH: Ξ" + str(eth_per_maggot)[0:10] \
               + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
               + "\nROT: R" + str(rot_per_maggot)[0:10] \
               + "\n" \
+              + "\nHolders = " + str(holders) \
               + "\nS. Cap: " + supply_cat_pretty \
               + "\nM. Cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
@@ -582,7 +585,6 @@ def get_price_rot(update: Update, context: CallbackContext):
     vol_24_pretty = number_to_beautiful(vol_24h)
 
     holders = get_number_holder_token(rot_contract)
-
 
     message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
               + "\nUSD: $" + str(dollar_per_rot)[0:10] \
