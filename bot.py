@@ -41,6 +41,41 @@ gecko_rot_url = "https://api.coingecko.com/api/v3/coins/rotten/market_chart/rang
 test_error_token = "Looks like you need to either: increase slippage (see /howtoslippage) and/or remove the decimals from the amount of ROT you're trying to buy"
 
 # Graph QL requests
+query_eth = '''query blocks {
+    t1: blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_gt: %d, timestamp_lt: %d}) {
+            number
+    }
+    t2: blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_gt: %d, timestamp_lt: %d}) {
+            number
+    }
+    tnow: blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_lt: %d}) {
+            number
+    }
+}'''
+
+query_uni = '''query blocks {
+    t1: token(id: "CONTRACT", block: {number: NUMBER_T1}) {
+        derivedETH
+    }
+    t2: token(id: "CONTRACT", block: {number: NUMBER_T2}) {
+        derivedETH
+    }
+    tnow: token(id: "CONTRACT", block: {number: NUMBER_TNOW}) {
+        derivedETH
+    }
+    b1: bundle(id: "1", block: {number: NUMBER_T1}) {
+        ethPrice
+    }
+    b2: bundle(id: "1", block: {number: NUMBER_T2}) {
+        ethPrice
+    }
+    bnow: bundle(id: "1", block: {number: NUMBER_TNOW}) {
+        ethPrice
+    }
+}
+
+'''
+
 req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
 req_graphql_maggot = '''{
 swaps(
@@ -61,8 +96,15 @@ swaps(
          amount1In 
          amount1Out  
  }}'''
-req_graphql_usdt = '''{token(id: "0xdac17f958d2ee523a2206206994597c13d831ec7") {derivedETH}}'''
-graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+
+req_graphql_vol24h_rot = '''{
+	pair(id:"0x5a265315520696299fa1ece0701c3a1ba961b888") {
+    volumeUSD
+  }  
+}'''
+
+graphql_client_uni = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+graphql_client_eth = GraphQLClient('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks')
 
 # log_file
 price_file_path = BASE_PATH + 'rot/log_files/price_hist.txt'
@@ -486,21 +528,46 @@ def get_number_holder_token(token):
     holders = res['pager']['holders']['records']
     return int(holders)
 
+
 # graphql queries
 
 def get_price_rot_raw():
-    resp_rot = graphql_client.execute(req_graphql_rot)
-    resp_usdt = graphql_client.execute(req_graphql_usdt)
+    now = int(time.time())
 
-    json_resp_rot = json.loads(resp_rot)
-    json_resp_usdt = json.loads(resp_usdt)
+    before_7d = now - 3600 * 24 * 7
+    before_7d_high = before_7d + 600
 
-    eth_per_rot = float(json_resp_rot['data']['token']['derivedETH'])
-    eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
+    before_1d = now - 3600 * 24
+    before_1d_high = before_1d + 600
 
-    dollar_per_rot = eth_per_rot / eth_per_usdt
+    updated_eth_query = query_eth % (before_7d, before_7d_high, before_1d, before_1d_high, now)
+    res_eth_query = graphql_client_eth.execute(updated_eth_query)
+    json_resp_eth = json.loads(res_eth_query)
 
-    return (eth_per_rot, dollar_per_rot)
+    block_from_7d = int(json_resp_eth['data']['t1'][0]['number'])
+    block_from_1d = int(json_resp_eth['data']['t2'][0]['number'])
+    latest_block = int(json_resp_eth['data']['tnow'][0]['number'])
+
+    query_uni_updated = query_uni.replace("CONTRACT", rot_contract) \
+        .replace("NUMBER_T1", str(block_from_7d)) \
+        .replace("NUMBER_T2", str(block_from_1d)) \
+        .replace("NUMBER_TNOW", str(latest_block - 3))
+
+    res_uni_query = graphql_client_uni.execute(query_uni_updated)
+    json_resp_uni = json.loads(res_uni_query)
+
+    derivedETH_7d = float(json_resp_uni['data']['t1']['derivedETH'])
+    derivedETH_1d = float(json_resp_uni['data']['t2']['derivedETH'])
+    derivedETH_now = float(json_resp_uni['data']['tnow']['derivedETH'])
+    eth_price_7d = float(json_resp_uni['data']['b1']['ethPrice'])
+    eth_price_1d = float(json_resp_uni['data']['b2']['ethPrice'])
+    eth_price_now = float(json_resp_uni['data']['bnow']['ethPrice'])
+
+    rot_price_7d_usd = derivedETH_7d * eth_price_7d
+    rot_price_1d_usd = derivedETH_1d * eth_price_1d
+    rot_price_now_usd = derivedETH_now * eth_price_now
+
+    return (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now, rot_price_now_usd)
 
 
 # return the amount of maggot per rot
@@ -519,14 +586,15 @@ def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
 
 
 def get_price_maggot_raw():
-    resp_maggot = graphql_client.execute(req_graphql_maggot)
+    resp_maggot = graphql_client_uni.execute(req_graphql_maggot)
 
     rot_per_maggot = get_ratio_rot_per_maggot(json.loads(resp_maggot))
 
-    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
+    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
+     rot_price_now_usd) = get_price_rot_raw()
 
-    dollar_per_maggot = dollar_per_rot * rot_per_maggot
-    eth_per_maggot = eth_per_rot * rot_per_maggot
+    dollar_per_maggot = rot_price_now_usd * rot_per_maggot
+    eth_per_maggot = derivedETH_now * rot_per_maggot
 
     return eth_per_maggot, dollar_per_maggot, rot_per_maggot
 
@@ -552,32 +620,26 @@ def get_price_maggot(update: Update, context: CallbackContext):
 
 
 # return price 7 days ago, price 1 day ago, volume last 24h
-def get_hist_prices_rot_from_gecko():
-    now = int(time.time())
+def get_volume_24h_rot():
+    res = graphql_client_uni.execute(req_graphql_vol24h_rot)
+    json_resp_eth = json.loads(res)
 
-    before = now - 3600 * 24 * 7
+    volume = int(json_resp_eth['data']['pair']['volumeUSD'])
 
-    url = gecko_rot_url + 'from=' + str(before) + '&to=' + str(now)
-
-    gecko_res = requests.get(url).json()
-    price_7d = gecko_res['prices'][0][1]
-    price_1d = gecko_res['prices'][-24][1]
-
-    vol_24h = gecko_res['total_volumes'][-1][1]
-
-    return (price_7d, price_1d, vol_24h)
+    return volume
 
 
 def get_price_rot(update: Update, context: CallbackContext):
-    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
+    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
+     rot_price_now_usd) = get_price_rot_raw()
 
     supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
-    market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
+    market_cap = number_to_beautiful(int(float(supply_cap_rot) * rot_price_now_usd))
 
-    (price_7d, price_1d, vol_24h) = get_hist_prices_rot_from_gecko()
-    var_7d = int(((dollar_per_rot - price_7d) / dollar_per_rot) * 100)
-    var_1d = int(((dollar_per_rot - price_1d) / dollar_per_rot) * 100)
+    vol_24h = get_volume_24h_rot()
+    var_7d = int(((rot_price_now_usd - rot_price_7d_usd) / rot_price_now_usd) * 100)
+    var_1d = int(((rot_price_now_usd - rot_price_7d_usd) / rot_price_now_usd) * 100)
 
     var_7d_str = "+" + str(var_7d) + "%" if var_7d > 0 else str(var_7d) + "%"
     var_1d_str = "+" + str(var_1d) + "%" if var_1d > 0 else str(var_1d) + "%"
@@ -586,8 +648,8 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     holders = get_number_holder_token(rot_contract)
 
-    message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
-              + "\nUSD: $" + str(dollar_per_rot)[0:10] \
+    message = "<pre>ETH: Ξ" + str(derivedETH_now)[0:10] \
+              + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
               + "\n24H:  " + var_1d_str \
               + "\n7D :  " + var_7d_str \
               + "\n" \
@@ -601,11 +663,12 @@ def get_price_rot(update: Update, context: CallbackContext):
 
 def log_current_price_rot_per_usd():
     global price_file_path
-    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
+    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
+     rot_price_now_usd) = get_price_rot_raw()
     with open(price_file_path, "a") as price_file:
         time_now = datetime.now()
         date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
-        message_to_write = date_time_str + " " + str(dollar_per_rot) + "\n"
+        message_to_write = date_time_str + " " + str(rot_price_now_usd) + "\n"
         price_file.write(message_to_write)
 
 
