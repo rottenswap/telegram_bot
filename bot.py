@@ -574,8 +574,8 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
               + "\nUSD: $" + str(dollar_per_rot)[0:10] \
-              + "\n24H: $" +var_1d_str \
-              + "\n7D : $" + var_7d_str \
+              + "\n24H: " +var_1d_str \
+              + "\n7D : " + var_7d_str \
               + "\n" \
               + "\nS. Cap: " + supply_cat_pretty \
               + "\nM. Cap: $" + market_cap + "</pre>"
