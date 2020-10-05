@@ -560,7 +560,15 @@ def get_price_rot_raw():
 
     # pprint.pprint(json_resp_uni)
 
-    rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
+    try:
+        rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
+    except KeyError: # trying again
+        print("trying again to query QUERY_UNI")
+        res_uni_query = graphql_client_uni.execute(query_uni_updated)
+        json_resp_uni = json.loads(res_uni_query)
+        rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
+
+    # rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     rot_per_eth_1d = float(json_resp_uni['data']['t2']['derivedETH'])
     rot_per_eth_now = float(json_resp_uni['data']['tnow']['derivedETH'])
     eth_price_7d = float(json_resp_uni['data']['b1']['ethPrice'])
@@ -629,7 +637,7 @@ def get_price_maggot(update: Update, context: CallbackContext):
 def get_volume_24h_rot():
     now = int(time.time())
     yesterday = now - 3600 * 24
-    print(str(yesterday))
+
     res = graphql_client_uni_2.execute(req_graphql_vol24h_rot.replace("TIMESTAMP_MINUS_24_H", str(yesterday)))
 
     json_resp_eth = json.loads(res)
@@ -1076,7 +1084,7 @@ def main():
     dp.add_handler(CommandHandler('rotfarmingguide', stake_command))
     dp.add_handler(CommandHandler('howtoslippage', how_to_slippage))
     dp.add_handler(CommandHandler('supplycap', get_supply_cap))
-    dp.add_handler(CommandHandler('4biz', get_biz))
+    dp.add_handler(CommandHandler('biz', get_biz))
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
     dp.add_handler(MessageHandler(Filters.photo, handle_new_image))
     dp.add_handler(CommandHandler('rot', get_price_rot))
@@ -1108,7 +1116,7 @@ links - Main links
 rotfarmingguide - Guide to $ROT farming
 howtoslippage - How to increase slippage
 supplycap - How ROTTED are we
-4biz - List biz thread
+biz - List biz thread
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 getchart - Display a (simple) price chart
