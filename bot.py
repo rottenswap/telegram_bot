@@ -38,7 +38,25 @@ test_error_token = "Looks like you need to either: increase slippage (see /howto
 
 # Graph QL requests
 req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
-req_graphql_maggot = '''{token(id: "0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89") {derivedETH}}'''
+req_graphql_maggot = '''{
+swaps(
+    first: 1, 
+    where: { pair: "0x5cfd4ee2886cf42c716be1e20847bda15547c693" } 
+    orderBy: timestamp, 
+    orderDirection: desc) 
+    {transaction 
+      {id timestamp}
+      id
+      pair {
+        token0 
+            {id symbol}
+        token1 
+            {id symbol}}
+         amount0In 
+         amount0Out 
+         amount1In 
+         amount1Out  
+ }}'''
 req_graphql_usdt = '''{token(id: "0xdac17f958d2ee523a2206206994597c13d831ec7") {derivedETH}}'''
 graphql_client = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 
@@ -473,23 +491,35 @@ def get_price_rot_raw():
     return (eth_per_rot, dollar_per_rot)
 
 
+# return the amount of maggot per rot
+def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
+    last_swaps_amount_maggot_in = float(last_swaps_maggot_rot_pair['amount0In'])
+    last_swaps_amount_maggot_out = float(last_swaps_maggot_rot_pair['amount0Out'])
+    last_swaps_amount_rot_in = float(last_swaps_maggot_rot_pair['amount1In'])
+    last_swaps_amount_rot_out = float(last_swaps_maggot_rot_pair['amount1Out'])
+    # check which direction the transaction took place. For that, if amount1In = 0, it was maggot -> rot
+    transaction_direction_maggot_to_rot = (last_swaps_amount_rot_in == 0)
+    if transaction_direction_maggot_to_rot:
+        return last_swaps_amount_rot_out / last_swaps_amount_maggot_in
+    else:
+        return last_swaps_amount_rot_in / last_swaps_amount_maggot_out
+
+
 def get_price_maggot_raw():
     resp_maggot = graphql_client.execute(req_graphql_maggot)
-    resp_usdt = graphql_client.execute(req_graphql_usdt)
 
-    json_resp_rot = json.loads(resp_maggot)
-    json_resp_usdt = json.loads(resp_usdt)
+    rot_per_maggot = get_ratio_rot_per_maggot(resp_maggot)
 
-    eth_per_maggot = float(json_resp_rot['data']['token']['derivedETH'])
-    eth_per_usdt = float(json_resp_usdt['data']['token']['derivedETH'])
+    (eth_per_rot, dollar_per_rot) = get_price_rot_raw()
 
-    dollar_per_maggot = eth_per_maggot / eth_per_usdt
+    dollar_per_maggot = rot_per_maggot / dollar_per_rot
+    eth_per_maggot = eth_per_rot / rot_per_maggot
 
-    return eth_per_maggot, dollar_per_maggot
+    return eth_per_maggot, dollar_per_maggot, rot_per_maggot
 
 
 def get_price_maggot(update: Update, context: CallbackContext):
-    (eth_per_maggot, dollar_per_maggot) = get_price_maggot_raw()
+    (eth_per_maggot, dollar_per_maggot, rot_per_maggot) = get_price_maggot_raw()
 
     supply_cap_maggot = get_supply_cap_raw(maggot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_maggot)
@@ -497,6 +527,7 @@ def get_price_maggot(update: Update, context: CallbackContext):
 
     message = "<pre>ETH: Ξ" + str(eth_per_maggot)[0:10] \
               + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
+              + "\nROT: R" + str(rot_per_maggot)[0:10] \
               + "\nsupply cap: " + supply_cat_pretty \
               + "\nmarket cap: $" + market_cap + "</pre>"
     chat_id = update.message.chat_id
@@ -919,7 +950,7 @@ def main():
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
     dp.add_handler(MessageHandler(Filters.photo, handle_new_image))
     dp.add_handler(CommandHandler('rot_price', get_price_rot))
-    # dp.add_handler(CommandHandler('maggot', get_price_maggot))
+    dp.add_handler(CommandHandler('maggot_price', get_price_maggot))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     dp.add_handler(CommandHandler('getChart', get_chart_price_pyplot))
