@@ -567,10 +567,15 @@ def get_price_rot(update: Update, context: CallbackContext):
     var_7d = int(((dollar_per_rot - price_7d) / dollar_per_rot) * 100)
     var_1d = int(((dollar_per_rot - price_1d) / dollar_per_rot) * 100)
 
+    var_7d_str = "+" + str(var_7d) + "%" if var_7d > 0 else "+" + str(var_7d) + "%"
+    var_1d_str = "+" + str(var_1d) + "%" if var_1d > 0 else "+" + str(var_1d) + "%"
+    
+
+
     message = "<pre>ETH: Ξ" + str(eth_per_rot)[0:10] \
               + "\nUSD: $" + str(dollar_per_rot)[0:10] \
-              + "\n24H: $" + str(var_1d) \
-              + "\n7D : $" + str(var_7d) \
+              + "\n24H: $" +var_1d_str \
+              + "\n7D : $" + var_7d_str \
               + "\n" \
               + "\nsupply cap: " + supply_cat_pretty \
               + "\nmarket cap: $" + market_cap + "</pre>"
