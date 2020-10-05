@@ -563,7 +563,7 @@ def get_price_rot(update: Update, context: CallbackContext):
     supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * dollar_per_rot))
-    (price_7d, price_1d, vol_24h) = get_hist_prices_rot_from_gecko
+    (price_7d, price_1d, vol_24h) = get_hist_prices_rot_from_gecko()
     var_7d = int(((dollar_per_rot - price_7d) / dollar_per_rot) * 100)
     var_1d = int(((dollar_per_rot - price_1d) / dollar_per_rot) * 100)
 
