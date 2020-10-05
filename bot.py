@@ -626,7 +626,8 @@ def get_price_maggot(update: Update, context: CallbackContext):
 def get_volume_24h_rot():
     now = int(time.time())
     yesterday = now - 3600 * 24
-    res = graphql_client_uni.execute(req_graphql_vol24h_rot).replace("TIMESTAMP_MINUS_24_H", str(yesterday))
+    print(str(yesterday))
+    res = graphql_client_uni.execute(req_graphql_vol24h_rot.replace("TIMESTAMP_MINUS_24_H", str(yesterday)))
 
     json_resp_eth = json.loads(res)
 
