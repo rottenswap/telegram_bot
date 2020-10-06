@@ -90,6 +90,8 @@ def __calculate_resolution_from_time(t_from, t_to):
         return 5
     elif delta < 24 * 3600:
         return 15
+    elif delta < 24 * 3600 * 7 + 100:
+        return 30
     else:
         return 60
 
@@ -138,13 +140,13 @@ def print_candlestick(token, t_from, t_to, file_path):
     __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path)
     return closes[-1]
 
-# 
+#
 # def main():
 #     token = "MAGGOT"
 #     t_to = int(time.time())
 #     t_from = t_to - 3600 * 12
 #     print_candlestick(token, t_from, t_to, "testaaa.png")
-# 
-# 
+#
+#
 # if __name__ == '__main__':
 #     main()
