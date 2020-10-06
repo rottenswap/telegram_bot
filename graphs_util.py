@@ -30,9 +30,9 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, file_p
 # t_from and t_to should be numbers, not strings
 def __calculate_resolution_from_time(t_from, t_to):
     delta = round(t_to - t_from)
-    if delta < 3 * 3600:
+    if delta < 7 * 3600:
         return 1
-    elif delta < 12 * 3600:
+    elif delta < 13 * 3600:
         return 5
     elif delta < 24 * 3600:
         return 15
