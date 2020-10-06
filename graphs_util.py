@@ -19,7 +19,7 @@ def __moving_average(interval, window_size=10):
 
 # Visualisation inspired by https://chart-studio.plotly.com/~jackp/17421/plotly-candlestick-chart-in-python/#/
 # Huge thanks to the author!
-def __process_and_write_candlelight(dates, openings, closes, highs, lows, volumes, file_path):
+def __process_and_write_candlelight(dates, openings, closes, highs, lows, volumes, file_path, token_name):
     data = [dict(
         type='candlestick',
         open=openings,
@@ -44,7 +44,7 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
     fig['layout']['height'] = 900
     fig['layout']['xaxis'] = dict(rangeslider=dict(visible=False))
     fig['layout']['yaxis'] = dict(domain=[0, 0.2], showticklabels=False)
-    fig['layout']['yaxis2'] = dict(domain=[0.2, 1], title='ROT price ($)', side='right')
+    fig['layout']['yaxis2'] = dict(domain=[0.2, 1], title= token_name + ' price ($)', side='right')
     fig['layout']['showlegend'] = False
     fig['layout']['margin'] = dict(t=15, b=15, r=15, l=15)
 
@@ -110,8 +110,23 @@ def __preprocess_chartex_data(values, resolution):
     missing_dates_count = 0
     for date in date_list:
         if date in times_from_chartex:
-            last_index = times_from_chartex.index(date) + missing_dates_count
-            pass
+            index = times_from_chartex.index(date)
+            last_index = index + missing_dates_count
+            # check if "too big" value and remove it in this case
+            if index == 0:
+                if highs[0] > highs[1] * 2:
+                    # print("reducing highs index 0")
+                    highs[0] = min(highs[1] * 3, highs[0] / 2)
+                if lows[0] < lows[1] / 2:
+                    # print("increasing lows index 0")
+                    lows[0] = max(lows[0] * 2, lows[1] / 2)
+            else:
+                if highs[index] > highs[index - 1] * 2 and highs[index] > highs[index + 1] * 2:
+                    # print("reducing highs")
+                    highs[index] = (highs[index - 1] + highs[index + 1])
+                if lows[index] < lows[index - 1] / 2 and lows[index] < lows[index + 1] / 2:
+                    # print("increasing lows: from " + str(lows[index]) + ' to ' + str(min(lows[index - 1] - lows[index], lows[index + 1] - lows[index])))
+                    lows[index] = min(lows[index - 1] - lows[index], lows[index + 1] - lows[index])
         else:
             index = last_index + 1
             price = closes[index - 1]
@@ -134,14 +149,14 @@ def print_candlestick(token, t_from, t_to, file_path):
 
     (date_list, opens, closes, highs, lows, volumes) = __preprocess_chartex_data(values, resolution)
 
-    __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path)
+    __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path, token)
     return closes[-1]
 
 #
 # def main():
-#     token = "MAGGOT"
+#     token = "UNI"
 #     t_to = int(time.time())
-#     t_from = t_to - 3600 * 12
+#     t_from = t_to - 3600 * 12 * 1000
 #     print_candlestick(token, t_from, t_to, "testaaa.png")
 #
 #
