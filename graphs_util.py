@@ -139,12 +139,12 @@ def print_candlestick(token, t_from, t_to, file_path):
     return closes[-1]
 
 
-def main():
-    token = "ROT"
-    t_to = int(time.time())
-    t_from = t_to - 3600 * 12
-    print_candlestick(token, t_from, t_to, "testaaa.png")
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     token = "ROT"
+#     t_to = int(time.time())
+#     t_from = t_to - 3600 * 12
+#     print_candlestick(token, t_from, t_to, "testaaa.png")
+# 
+# 
+# if __name__ == '__main__':
+#     main()
