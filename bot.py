@@ -103,7 +103,6 @@ req_graphql_vol24h_rot = '''{
   }
 }'''
 
-
 graphql_client_uni = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 graphql_client_uni_2 = GraphQLClient('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
 graphql_client_eth = GraphQLClient('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks')
@@ -854,7 +853,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
         print("hello me")
         last_time_checked_price_chart = 1
 
-    time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
+    time_type, time_start, k_hours, k_days, query_ok, simple_query, token = check_query(query_received)
 
     if query_ok:
         new_time = round(time.time())
@@ -897,17 +896,19 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
 
 
-
 def check_query(query_received):
     query_ok, simple_query = True, False
-    time_type, time_start, k_hours, k_days = 'd', 7, 0, 7
+    time_type, time_start, k_hours, k_days, token = 'd', 7, 0, 7, "ROT"
     if len(query_received) == 1:
         simple_query = True
     elif len(query_received) == 3:
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
+    elif len(query_received) == 4:
+        time_type, time_start, k_hours, k_days = get_from_query(query_received)
+        token = query_received[-1]
     else:
         query_ok = False
-    return time_type, time_start, k_hours, k_days, query_ok, simple_query
+    return time_type, time_start, k_hours, k_days, query_ok, simple_query, token
 
 
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
@@ -919,7 +920,7 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
         print("hello me")
         last_time_checked_price_candles = 1
 
-    time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
+    time_type, time_start, k_hours, k_days, query_ok, simple_query, token = check_query(query_received)
 
     if query_ok:
         new_time = round(time.time())
@@ -928,9 +929,9 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
                 last_time_checked_price_candles = new_time
 
             t_to = int(time.time())
-            t_from = t_to - (k_days * 3600*24) - (k_hours * 3600)
+            t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
 
-            last_price = graphs_util.print_candlestick('ROT', t_from, t_to, candels_file_path)
+            last_price = graphs_util.print_candlestick(token, t_from, t_to, candels_file_path)
 
             caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
                 last_price)[0:10] + "</pre>"
@@ -956,7 +957,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
         print("hello me")
         last_time_checked_price_supply = 1
 
-    time_type, time_start, k_hours, k_days, query_ok, simple_query = check_query(query_received)
+    time_type, time_start, k_hours, k_days, query_ok, simple_query, token = check_query(query_received)
 
     if query_ok:
         new_time = round(time.time())
