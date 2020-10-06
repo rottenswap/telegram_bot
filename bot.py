@@ -194,9 +194,8 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
                                                                                   'LiveCoinWatch') + ' ' + create_href_str(
     url_coinmarketcap, 'CoinMarketCap') + '\n' \
         + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' + create_href_str(
-    url_reddit_rottenswap, 'Reddit') + '\n' \
-        + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2,
-                                                                                                    'RottenMerch') + '\n' \
+    url_reddit_rottenswap, 'Reddit') + ' ' + create_href_str("https://discord.gg/WFp5sQ", 'Discord') '\n' \
+        + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2, 'RottenMerch') + '\n' \
         + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp 中國 -> @RottenSwapCN'
 
 # GIT INIT
@@ -940,7 +939,7 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
             caption = "Price of the last " + str(time_start) + str(time_type) + " of " + token + \
                       ".\nCurrent price: <pre>$" + str(last_price)[0:10] + "</pre>" + \
                       '\nData from <a href="chartex.pro">chartex.pro</a>' \
-                      + '\nWant this bot for your token? contact @rotted_ben.'
+                      + '\nWant this bot for your token? contact @ rotted_ben.'
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
