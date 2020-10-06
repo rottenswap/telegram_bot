@@ -900,7 +900,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
 
 def check_query(query_received):
     query_ok, simple_query = True, False
-    time_type, time_start, k_hours, k_days = 'd', 0, 0, 100
+    time_type, time_start, k_hours, k_days = 'd', 0, 0, 7
     if len(query_received) == 1:
         simple_query = True
     elif len(query_received) == 3:
@@ -932,12 +932,8 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
 
             last_price = graphs_util.print_candlestick('ROT', t_from, t_to, candels_file_path)
 
-            if simple_query:
-                caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(
-                    last_price)[0:10] + "</pre>"
-            else:
-                caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
-                    last_price)[0:10] + "</pre>"
+            caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
+                last_price)[0:10] + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
