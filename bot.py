@@ -632,10 +632,10 @@ def get_price_maggot(update: Update, context: CallbackContext):
               + "\nETH: Ξ" + str(eth_per_maggot)[0:10] \
               + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
               + "\n" \
-              + "\n1ROT   : " + str(maggot_per_rot)[0:4] + " MAGGOT" \
-              + "\nS. Cap : " + supply_cat_pretty \
-              + "\nM. Cap : $" + market_cap \
-              + "\nHolders: " + str(holders) + "</code>"
+              + "\n1ROT    = " + str(maggot_per_rot)[0:4] + " MAGGOT" \
+              + "\nS. Cap  = " + supply_cat_pretty \
+              + "\nM. Cap  = $" + market_cap \
+              + "\nHolders = " + str(holders) + "</code>"
 
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
