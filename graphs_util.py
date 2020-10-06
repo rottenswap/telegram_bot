@@ -75,9 +75,6 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
                             marker=dict(color=colors_volume),
                             type='bar', yaxis='y', name='Volume'))
 
-    print("done preprocessing, showing")
-
-    # pio.show(fig)
     pio.write_image(fig=fig, file=file_path, scale=4)
 
 
