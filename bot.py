@@ -562,11 +562,10 @@ def get_price_rot_raw():
 
     try:
         rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
-    except KeyError:  # trying again
-        print("message uni: " + res_uni_query)
+    except KeyError:  # trying again, as sometimes the block that we query has not yet been indexed. For that, we read
+        # the error message returned by uniswap and work on the last indexed block that is return in the error message
+        # TODO: work with regex as block numbers can be < 10000000
         last_block_indexed = str(res_uni_query).split('indexed up to block number ')[1][0:8]
-        print("block = " + last_block_indexed)
-        # print("trying again to query QUERY_UNI. Error: " + str(json_resp_uni))
         query_uni_updated = query_uni.replace("CONTRACT", rot_contract_formatted_uni) \
             .replace("NUMBER_T1", str(block_from_7d)) \
             .replace("NUMBER_T2", str(block_from_1d)) \
