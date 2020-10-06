@@ -197,7 +197,7 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
     url_reddit_rottenswap, 'Reddit') + '\n' \
         + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2,
                                                                                                     'RottenMerch') + '\n' \
-        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp'
+        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp 中國 @RottenSwapCN'
 
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
@@ -901,6 +901,8 @@ def check_query(query_received):
     time_type, time_start, k_hours, k_days, token = 'd', 7, 0, 7, "ROT"
     if len(query_received) == 1:
         simple_query = True
+    elif len(query_received) == 2:
+        token = query_received[1]
     elif len(query_received) == 3:
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
     elif len(query_received) == 4:
