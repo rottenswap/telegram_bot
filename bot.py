@@ -564,6 +564,7 @@ def get_price_rot_raw():
         rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     except KeyError as err:  # trying again
         print("err: " + str(err))
+        print("err repr: " + repr(err))
         pprint.pprint(err)
         last_block_indexed = str(err).split('indexed up to block number ')[1][0:7]
         print("block = " + last_block_indexed)
