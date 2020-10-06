@@ -21,6 +21,7 @@ import os
 import json
 from bot_util import RepeatedTimer
 from images import Ocr
+import graphs_util
 import plotly.graph_objects as go
 import pprint
 
@@ -896,63 +897,6 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
 
 
-def strp_date_candles(raw_date):
-    return datetime.strptime(raw_date[:-3], '%m/%d/%Y,%H:%M')
-
-
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    things = []
-    for i in range(0, len(lst) - 1, n):  # avoiding the last values as it can lead to some bugs
-        second_part = [float(x[1]) for x in lst[i:i + n]]
-        date = strp_date_candles(lst[i][0])
-        things.append((date, second_part))
-    return things
-
-
-# date opening closing high low
-def transform_to_candelstick_format(list_values, resolution):
-    if len(list_values) > 600:
-        subvalues = chunks(list_values, 4 * resolution * 2)
-    else:
-        subvalues = chunks(list_values, 4 * resolution)
-    lst_dates = []
-    lst_openings = []
-    lst_closes = []
-    lst_highs = []
-    lst_lows = []
-    for value_date_price in subvalues:
-        prices = value_date_price[1]
-        lst_dates.append(value_date_price[0])
-        lst_highs.append(max(prices))
-        lst_lows.append(min(prices))
-        lst_openings.append(prices[0])
-        if len(prices) >= 2:
-            lst_closes.append(prices[-1])
-        else:
-            lst_closes.append(prices[0])
-    return lst_dates, lst_openings, lst_closes, lst_highs, lst_lows
-
-
-def print_candlelight(dates, openings, closes, highs, lows):
-    fig = go.Figure(data=[go.Candlestick(x=dates,
-                                         open=openings,
-                                         high=highs,
-                                         low=lows,
-                                         close=closes)])
-    fig.update_layout(
-        autosize=False,
-        width=1600,
-        height=900,
-        # title='Road to $.666',
-        yaxis_title='ROT price (usdt)',
-        xaxis_rangeslider_visible=False,
-        yaxis_side="right",
-        margin=go.layout.Margin(l=15, r=15, b=15, t=15)
-    )
-    fig.write_image(candels_file_path, scale=4)
-    plt.close()
-
 
 def check_query(query_received):
     query_ok, simple_query = True, False
@@ -982,27 +926,18 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
         if new_time - last_time_checked_price_candles > 60:
             if update.message.from_user.first_name != 'Ben':
                 last_time_checked_price_candles = new_time
-            list_time_price = []
 
-            with open(price_file_path, newline='') as csvfile:
-                spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-                for row in spamreader:
-                    list_time_price.append((row[0], row[1]))
+            t_to = int(time.gmtime())
+            t_from = t_to - (k_days * 3600*24) - (k_hours * 3600)
 
-            now = datetime.utcnow()
+            last_price = graphs_util.print_candlestick('ROT', t_from, t_to, candels_file_path)
 
-            filtered_values = [x for x in list_time_price if
-                               now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
-            resolution = 1
-            (dates, openings, closes, highs, lows) = transform_to_candelstick_format(filtered_values, resolution)
-
-            print_candlelight(dates, openings, closes, highs, lows)
             if simple_query:
                 caption = "Candlestick chart since the bot starting logging the price.\nCurrent price: <pre>$" + str(
-                    list_time_price[-1][1])[0:10] + "</pre>"
+                    last_price)[0:10] + "</pre>"
             else:
                 caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
-                    list_time_price[-1][1])[0:10] + "</pre>"
+                    last_price)[0:10] + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
