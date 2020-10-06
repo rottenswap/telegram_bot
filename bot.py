@@ -900,7 +900,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
 
 def check_query(query_received):
     query_ok, simple_query = True, False
-    time_type, time_start, k_hours, k_days = 'd', 0, 0, 7
+    time_type, time_start, k_hours, k_days = 'd', 7, 0, 7
     if len(query_received) == 1:
         simple_query = True
     elif len(query_received) == 3:
