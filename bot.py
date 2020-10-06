@@ -121,11 +121,11 @@ api_proposal_url = 'https://rotapi.xyz/governance/getProposals'
 last_proposal_received_id = -1
 telegram_governance_url = 't.me/rottengovernance'
 rotten_main_chat_id = -1001382715556
-last_time_checked_price_chart = round(time.time())
-last_time_checked_price_candles = round(time.time())
-last_time_checked_price_supply = round(time.time())
-last_time_checked_4chan = round(time.time())
-last_time_checked_twitter = round(time.time())
+last_time_checked_price_chart = 0
+last_time_checked_price_candles = 0
+last_time_checked_price_supply = 0
+last_time_checked_4chan = 0
+last_time_checked_twitter = 0
 
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting')
 
@@ -197,7 +197,7 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
     url_reddit_rottenswap, 'Reddit') + '\n' \
         + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2,
                                                                                                     'RottenMerch') + '\n' \
-        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp 中國 @RottenSwapCN'
+        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp 中國 -> @RottenSwapCN'
 
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
@@ -935,8 +935,8 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
 
             last_price = graphs_util.print_candlestick(token, t_from, t_to, candels_file_path)
 
-            caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
-                last_price)[0:10] + "</pre>"
+            caption = "Price of the last " + str(time_start) + str(time_type) + " for token " + token + \
+                      ".\nCurrent price: <pre>$" + str(last_price)[0:10] + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
