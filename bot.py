@@ -564,7 +564,7 @@ def get_price_rot_raw():
         rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     except KeyError:  # trying again
         print("message uni: " + res_uni_query)
-        last_block_indexed = str(res_uni_query).split('indexed up to block number ')[1][0:7]
+        last_block_indexed = str(res_uni_query).split('indexed up to block number ')[1][0:8]
         print("block = " + last_block_indexed)
         # print("trying again to query QUERY_UNI. Error: " + str(json_resp_uni))
         query_uni_updated = query_uni.replace("CONTRACT", rot_contract_formatted_uni) \
