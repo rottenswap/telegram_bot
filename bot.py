@@ -672,7 +672,7 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     holders = get_number_holder_token(rot_contract)
 
-    message = "<code>(ROT) RotToken" \
+    message = "<code>(ROT) RottenToken" \
               + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
               + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
               + "\n24H:  " + var_1d_str \
