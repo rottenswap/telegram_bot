@@ -927,7 +927,7 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
             if update.message.from_user.first_name != 'Ben':
                 last_time_checked_price_candles = new_time
 
-            t_to = int(time.gmtime())
+            t_to = int(time.time())
             t_from = t_to - (k_days * 3600*24) - (k_hours * 3600)
 
             last_price = graphs_util.print_candlestick('ROT', t_from, t_to, candels_file_path)
