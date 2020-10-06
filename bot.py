@@ -553,7 +553,7 @@ def get_price_rot_raw():
     query_uni_updated = query_uni.replace("CONTRACT", rot_contract_formatted_uni) \
         .replace("NUMBER_T1", str(block_from_7d)) \
         .replace("NUMBER_T2", str(block_from_1d)) \
-        .replace("NUMBER_TNOW", str(latest_block - 1))
+        .replace("NUMBER_TNOW", str(latest_block))
 
     res_uni_query = graphql_client_uni.execute(query_uni_updated)
     json_resp_uni = json.loads(res_uni_query)
@@ -562,8 +562,8 @@ def get_price_rot_raw():
 
     try:
         rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
-    except KeyError as err: # trying again
-
+    except KeyError as err:  # trying again
+        print("err: " + str(err))
         pprint.pprint(err)
         last_block_indexed = str(err).split('indexed up to block number ')[1][0:7]
         print("block = " + last_block_indexed)
