@@ -26,6 +26,7 @@ import plotly.graph_objects as go
 import pprint
 
 # ENV FILES
+TELEGRAM_KEY = os.environ.get('TELEGRAM_KEY')
 etherscan_api_key = os.environ.get('ETH_API_KEY')
 APP_KEY = os.environ.get('TWITTER_API_KEY')
 APP_SECRET = os.environ.get('TWITTER_API_KEY_SECRET')
@@ -1020,7 +1021,7 @@ def get_airdrop(update: Update, context: CallbackContext):
 
 
 def main():
-    updater = Updater('1240870832:AAGFH0uk-vqk8de07pQV9OAQ1Sk9TN8auiE', use_context=True)
+    updater = Updater(TELEGRAM_KEY, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('rotme', send_meme_to_chat))
     dp.add_handler(CommandHandler('links', get_links))
