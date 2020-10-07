@@ -107,7 +107,7 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
 # t_from and t_to should be numbers, not strings
 def __calculate_resolution_from_time(t_from, t_to):
     delta = round(t_to - t_from)
-    if delta < 7 * 3600:
+    if delta < 6 * 3600:
         return 1
     elif delta < 13 * 3600:
         return 5
@@ -178,7 +178,7 @@ def print_candlestick(token, t_from, t_to, file_path):
     __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path, token)
     return closes[-1]
 
-# 
+#
 # def test_print_candlestick(token, t_from, t_to, resolution=1):
 #     t_1 = time.time_ns() // 1000000
 #     values = requests_util.get_graphex_data(token, resolution, t_from, t_to).json()
@@ -189,11 +189,11 @@ def print_candlestick(token, t_from, t_to, file_path):
 #     print("size = " + str(len(date_list)))
 #     time_between = date_list[-1] - date_list[0]
 #     print("diff: " + str(time_between))
-# 
+#
 #     # __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path, token)
 #     print("time chartex query = " + str(t_2 - t_1))
-# 
-# 
+#
+#
 # def main():
 #     token = "ROT"
 #     t_to = int(time.time())
@@ -203,7 +203,7 @@ def print_candlestick(token, t_from, t_to, file_path):
 #     test_print_candlestick(token, t_from, t_to, 15)
 #     test_print_candlestick(token, t_from, t_to, 30)
 #     test_print_candlestick(token, t_from, t_to, 60)
-# 
-# 
+#
+#
 # if __name__ == '__main__':
 #     main()
