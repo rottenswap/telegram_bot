@@ -56,7 +56,7 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
     fig['layout']['width'] = 1600
     fig['layout']['height'] = 900
     fig['layout']['xaxis'] = dict(rangeslider=dict(visible=False))
-    fig['layout']['yaxis'] = dict(domain=[0, 0.2], showticklabels=True, title='Volume ($)', side='right')
+    fig['layout']['yaxis'] = dict(domain=[0, 0.19], showticklabels=True, title='Volume ($)', side='right')
     fig['layout']['yaxis2'] = dict(domain=[0.2, 1], title=token_name + ' price ($)', side='right')
     fig['layout']['showlegend'] = False
     fig['layout']['margin'] = dict(t=15, b=15, r=15, l=15)
@@ -192,18 +192,14 @@ def print_candlestick(token, t_from, t_to, file_path):
 #
 #     # __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path, token)
 #     print("time chartex query = " + str(t_2 - t_1))
-#
-#
+# 
+# 
 # def main():
 #     token = "ROT"
 #     t_to = int(time.time())
 #     t_from = 0
-#     test_print_candlestick(token, t_from, t_to)
-#     test_print_candlestick(token, t_from, t_to, 5)
-#     test_print_candlestick(token, t_from, t_to, 15)
-#     test_print_candlestick(token, t_from, t_to, 30)
-#     test_print_candlestick(token, t_from, t_to, 60)
-#
-#
+#     print_candlestick(token, t_from, t_to, "testaaa2.png")
+# 
+# 
 # if __name__ == '__main__':
 #     main()
