@@ -1034,8 +1034,8 @@ def main():
     dp.add_handler(CommandHandler('maggot', get_price_maggot))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
-    dp.add_handler(CommandHandler('getChart', get_chart_price_pyplot))
-    dp.add_handler(CommandHandler('getChartSupply', get_chart_supply_pyplot))
+    dp.add_handler(CommandHandler('chart', get_chart_price_pyplot))
+    dp.add_handler(CommandHandler('chartSupply', get_chart_supply_pyplot))
     dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(CommandHandler('candlestick', get_candlestick_pyplot))
@@ -1062,8 +1062,8 @@ supplycap - How ROTTED are we
 biz - List biz thread
 twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
-getchart - Display a (simple) price chart
-getchartsupply - Display a graph of the supply cap
+chart - Display a (simple) price chart
+chartsupply - Display a graph of the supply cap
 candlestick - Candlestick chart 
 airdropinfo - Info about the airdrop
 """
