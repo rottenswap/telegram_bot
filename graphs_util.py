@@ -1,12 +1,11 @@
 import datetime
 import time
 
-import matplotlib.pyplot as plt
 import pandas as pd
-import plotly.graph_objects as go
 import requests_util
 import numpy as np
 import plotly.io as pio
+import pprint
 
 INCREASING_COLOR = '#228B22'
 DECREASING_COLOR = '#FF0000'
@@ -15,6 +14,15 @@ DECREASING_COLOR = '#FF0000'
 def __moving_average(interval, window_size=10):
     window = np.ones(int(window_size)) / float(window_size)
     return np.convolve(interval, window, 'same')
+
+
+def __bbands(price, window_size=10, num_of_std=5):
+    price_pd = pd.DataFrame(price)
+    rolling_mean = price_pd.rolling(window=window_size).mean()
+    rolling_std = price_pd.rolling(window=window_size).std()
+    upper_band = rolling_mean + (rolling_std * num_of_std)
+    lower_band = rolling_mean - (rolling_std * num_of_std)
+    return rolling_mean, upper_band, lower_band
 
 
 # Visualisation inspired by https://chart-studio.plotly.com/~jackp/17421/plotly-candlestick-chart-in-python/#/
@@ -33,6 +41,11 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
         decreasing=dict(line=dict(color=DECREASING_COLOR)),
     )]
 
+    # max_price = max(highs)
+    # max_y = max_price + max_price * 0.2
+    # min_price = min(lows)
+    # min_y = max(0, min_price - min_price * 0.2)
+
     layout = dict()
 
     fig = dict(data=data, layout=layout)
@@ -43,10 +56,23 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
     fig['layout']['width'] = 1600
     fig['layout']['height'] = 900
     fig['layout']['xaxis'] = dict(rangeslider=dict(visible=False))
-    fig['layout']['yaxis'] = dict(domain=[0, 0.2], showticklabels=False)
-    fig['layout']['yaxis2'] = dict(domain=[0.2, 1], title= token_name + ' price ($)', side='right')
+    fig['layout']['yaxis'] = dict(domain=[0, 0.2], showticklabels=True, title='Volume ($)', side='right')
+    fig['layout']['yaxis2'] = dict(domain=[0.2, 1], title=token_name + ' price ($)', side='right')
     fig['layout']['showlegend'] = False
     fig['layout']['margin'] = dict(t=15, b=15, r=15, l=15)
+
+    # bb_avg, bb_upper, bb_lower = __bbands(closes)
+    #
+    # fig['data'].append(dict(x=dates, y=bb_upper[0].to_list(), type='scatter', yaxis='y2',
+    #                         line=dict(width=1),
+    #                         marker=dict(color='#ccc'), hoverinfo='none',
+    #                         legendgroup='Bollinger Bands', name='Bollinger Bands'))
+    #
+    #
+    # fig['data'].append(dict(x=dates, y=bb_lower[0].to_list(), type='scatter', yaxis='y2',
+    #                         line=dict(width=1),
+    #                         marker=dict(color='#ccc'), hoverinfo='none',
+    #                         legendgroup='Bollinger Bands', showlegend=False))
 
     mv_y = __moving_average(closes)
     mv_x = list(dates)
@@ -56,7 +82,7 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
     mv_y = mv_y[5:-5]
 
     fig['data'].append(dict(x=mv_x, y=mv_y, type='scatter', mode='lines',
-                            line=dict(width=1),
+                            line=dict(width=2),
                             marker=dict(color='#E377C2'),
                             yaxis='y2', name='Moving Average'))
 
@@ -75,7 +101,7 @@ def __process_and_write_candlelight(dates, openings, closes, highs, lows, volume
                             marker=dict(color=colors_volume),
                             type='bar', yaxis='y', name='Volume'))
 
-    pio.write_image(fig=fig, file=file_path, scale=4)
+    pio.write_image(fig=fig, file=file_path, scale=3)
 
 
 # t_from and t_to should be numbers, not strings
@@ -152,13 +178,32 @@ def print_candlestick(token, t_from, t_to, file_path):
     __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path, token)
     return closes[-1]
 
-#
+# 
+# def test_print_candlestick(token, t_from, t_to, resolution=1):
+#     t_1 = time.time_ns() // 1000000
+#     values = requests_util.get_graphex_data(token, resolution, t_from, t_to).json()
+#     t_2 = time.time_ns() // 1000000
+#     (date_list, opens, closes, highs, lows, volumes) = __preprocess_chartex_data(values, resolution)
+#     print("0 = " + str(date_list[0]))
+#     print("last = " + str(date_list[-1]))
+#     print("size = " + str(len(date_list)))
+#     time_between = date_list[-1] - date_list[0]
+#     print("diff: " + str(time_between))
+# 
+#     # __process_and_write_candlelight(date_list, opens, closes, highs, lows, volumes, file_path, token)
+#     print("time chartex query = " + str(t_2 - t_1))
+# 
+# 
 # def main():
-#     token = "UNI"
+#     token = "ROT"
 #     t_to = int(time.time())
-#     t_from = t_to - 3600 * 12 * 1000
-#     print_candlestick(token, t_from, t_to, "testaaa.png")
-#
-#
+#     t_from = 0
+#     test_print_candlestick(token, t_from, t_to)
+#     test_print_candlestick(token, t_from, t_to, 5)
+#     test_print_candlestick(token, t_from, t_to, 15)
+#     test_print_candlestick(token, t_from, t_to, 30)
+#     test_print_candlestick(token, t_from, t_to, 60)
+# 
+# 
 # if __name__ == '__main__':
 #     main()
