@@ -689,8 +689,8 @@ def get_price_rot(update: Update, context: CallbackContext):
         message = message + "Parts of Uniswap info seems down. Price might be outdated.\n"
 
     message = message + "<code>(ROT) RottenToken" \
-              + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
-              + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
+              + "\nETH: Ξ" + "Price not working now" \  # str(derivedETH_now)[0:10] \
+              + "\nUSD: $" + "Price not working now" \  # str(rot_price_now_usd)[0:10] \
               + "\n24H:  " + var_1d_str \
               + "\n7D :  " + var_7d_str \
               + "\n" \
