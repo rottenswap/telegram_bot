@@ -627,8 +627,12 @@ def get_price_maggot(update: Update, context: CallbackContext):
     maggot_per_rot = 1 / rot_per_maggot
 
     holders = get_number_holder_token(maggot_contract)
+    message = ""
 
-    message = "<code>(MAGGOT) MaggotToken" \
+    if str(dollar_per_maggot)[0:10] == "0.07514950":
+        message = message + "Uniswap info having trouble. Price might be outdated.\n"
+
+    message = message + "<code>(MAGGOT) MaggotToken" \
               + "\nETH: Ξ" + str(eth_per_maggot)[0:10] \
               + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
               + "\n" \
@@ -680,7 +684,11 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     holders = get_number_holder_token(rot_contract)
 
-    message = "<code>(ROT) RottenToken" \
+    message = ""
+    if str(rot_price_now_usd)[0:10] == "0.13587689":
+        message = message + "Uniswap info having trouble. Price might be outdated.\n"
+
+    message = message + "<code>(ROT) RottenToken" \
               + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
               + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
               + "\n24H:  " + var_1d_str \
@@ -759,7 +767,7 @@ Con.Adr = 0xd04...9e2
 #     else:
 #         if id_last_proposal > last_proposal_received_id:
 #             last_proposal_received_id = id_last_proposal
-#             proposal_title = last_proposal['title']
+#             proposal_title = print_candlesticklast_proposal['title']
 #             description = last_proposal['description']
 #             message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
 #                       + description + '\nGo vote at ' \
