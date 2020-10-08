@@ -630,7 +630,7 @@ def get_price_maggot(update: Update, context: CallbackContext):
     message = ""
 
     if str(dollar_per_maggot)[0:10] == "0.07514950":
-        message = message + "Uniswap info having trouble. Price might be outdated.\n"
+        message = message + "Parts of Uniswap info seems down. Price might be outdated.\n"
 
     message = message + "<code>(MAGGOT) MaggotToken" \
               + "\nETH: Ξ" + str(eth_per_maggot)[0:10] \
@@ -686,7 +686,7 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     message = ""
     if str(rot_price_now_usd)[0:10] == "0.13587689":
-        message = message + "Uniswap info having trouble. Price might be outdated.\n"
+        message = message + "Parts of Uniswap info seems down. Price might be outdated.\n"
 
     message = message + "<code>(ROT) RottenToken" \
               + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
