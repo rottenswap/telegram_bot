@@ -197,7 +197,7 @@ links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\
         + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' + create_href_str(
     url_reddit_rottenswap, 'Reddit') + ' ' + create_href_str("https://discord.gg/WFp5sQ", 'Discord') + '\n' \
         + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2, 'RottenMerch') + '\n' \
-        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp 中國 -> @RottenSwapCN'
+        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp 中國 -> @RottenSwapCN @RottenSwapAR'
 
 # GIT INIT
 repo = Repo(MEME_GIT_REPO)
@@ -688,9 +688,11 @@ def get_price_rot(update: Update, context: CallbackContext):
     if str(rot_price_now_usd)[0:10] == "0.13587689":
         message = message + "Parts of Uniswap info seems down. Price might be outdated.\n"
 
+    # str(derivedETH_now)[0:10] \
+    # str(rot_price_now_usd)[0:10] \
     message = message + "<code>(ROT) RottenToken" \
-              + "\nETH: Ξ" + "Price not working now" \  # str(derivedETH_now)[0:10] \
-              + "\nUSD: $" + "Price not working now" \  # str(rot_price_now_usd)[0:10] \
+              + "\nETH: Ξ" + "Price not working now" \
+              + "\nUSD: $" + "Price not working now" \
               + "\n24H:  " + var_1d_str \
               + "\n7D :  " + var_7d_str \
               + "\n" \
