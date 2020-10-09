@@ -690,8 +690,8 @@ def get_price_rot(update: Update, context: CallbackContext):
 
 
     message = message + "<code>(ROT) RottenToken" \
-              + str(derivedETH_now)[0:10] \
-              + str(rot_price_now_usd)[0:10] \
+              + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
+              + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
               + "\n24H:  " + var_1d_str \
               + "\n7D :  " + var_7d_str \
               + "\n" \
