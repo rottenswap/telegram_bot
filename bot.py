@@ -667,7 +667,7 @@ def get_volume_24h_rot():
 
 
 def get_price_rot(update: Update, context: CallbackContext):
-    
+
     global last_time_checked_price_price
     new_time = round(time.time())
     small_format = False
@@ -676,8 +676,7 @@ def get_price_rot(update: Update, context: CallbackContext):
         small_format = True
 
 
-    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
-     rot_price_now_usd) = get_price_rot_raw()
+    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now, rot_price_now_usd) = get_price_rot_raw()
 
     supply_cap_rot = get_supply_cap_raw(rot_contract)
     supply_cat_pretty = number_to_beautiful(supply_cap_rot)
@@ -695,10 +694,10 @@ def get_price_rot(update: Update, context: CallbackContext):
     holders = get_number_holder_token(rot_contract)
 
     message = ""
-    
+
     if small_format:
         message = message + "<code>(ROT) RottenToken (more info only once per minute)" \
-                   + "\nUSD: $" + str(rot_price_now_usd)[0:10] 
+                   + "\nUSD: $" + str(rot_price_now_usd)[0:10] + "</code>"
     else:
         message = message + "<code>(ROT) RottenToken" \
                   + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
