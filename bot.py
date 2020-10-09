@@ -671,7 +671,6 @@ def get_price_rot(update: Update, context: CallbackContext):
     global last_time_checked_price_price
     new_time = round(time.time())
     small_format = True
-    pprint.pprint(new_time - last_time_checked_price_price)
     if new_time - last_time_checked_price_price > 60:
         last_time_checked_price_price = new_time
         small_format = False
@@ -697,8 +696,7 @@ def get_price_rot(update: Update, context: CallbackContext):
     message = ""
 
     if small_format:
-        message = message + "<code>(ROT) RottenToken (more info only once per minute)" \
-                   + "\nUSD: $" + str(rot_price_now_usd)[0:10] + "</code>"
+        message = message + "<code>(ROT) USD: $" + str(rot_price_now_usd)[0:7] + "</code>"
     else:
         message = message + "<code>(ROT) RottenToken" \
                   + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
