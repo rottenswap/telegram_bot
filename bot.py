@@ -958,9 +958,8 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
             last_price = graphs_util.print_candlestick(token, t_from, t_to, candels_file_path)
 
             caption = "Price of the last " + str(time_start) + str(time_type) + " of " + token + \
-                      ".\nCurrent price: <pre>$" + str(last_price)[0:10] + "</pre>" + \
-                      '\nData from <a href="chartex.pro">chartex.pro</a>. Want this bot for your token? contact @ ' \
-                      'rotted_ben. '
+                      ".\nCurrent price: <pre>$" + str(last_price)[0:7] + "</pre>" + \
+                      '\nWant this bot on your tg? -> contact @ rotted_ben.'
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
