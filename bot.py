@@ -11,13 +11,11 @@ import matplotlib.dates
 import matplotlib.pyplot
 import csv
 import requests
-import random
 import imagehash
 import shutil
 import time
 import re
 import random
-import markovify
 import locale
 import os
 import json
@@ -28,14 +26,14 @@ import plotly.graph_objects as go
 import pprint
 
 # ENV FILES
-TELEGRAM_KEY = os.environ.get('NICE_TELEGRAM_KEY')
+TELEGRAM_KEY = os.environ.get('TELEGRAM_KEY')
 etherscan_api_key = os.environ.get('ETH_API_KEY')
 APP_KEY = os.environ.get('TWITTER_API_KEY')
 APP_SECRET = os.environ.get('TWITTER_API_KEY_SECRET')
 ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_SECRET_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
-MEME_GIT_REPO = os.environ.get('NICE_MEME_GIT_REPO')
-TMP_FOLDER = os.environ.get('NICE_TMP_MEME_FOLDER')
+MEME_GIT_REPO = os.environ.get('MEME_GIT_REPO')
+TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
 BASE_PATH = os.environ.get('BASE_PATH')
 
 ethexplorer_holder_base_url = "https://ethplorer.io/service/service.php?data="
@@ -77,9 +75,30 @@ query_uni = '''query blocks {
 }
 '''
 
+req_graphql_rot = '''{token(id: "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2") {derivedETH}}'''
+req_graphql_maggot = '''{
+swaps(
+    first: 1, 
+    where: { pair: "0x5cfd4ee2886cf42c716be1e20847bda15547c693" } 
+    orderBy: timestamp, 
+    orderDirection: desc) 
+    {transaction 
+      {id timestamp}
+      id
+      pair {
+        token0 
+            {id symbol}
+        token1 
+            {id symbol}}
+         amount0In 
+         amount0Out 
+         amount1In 
+         amount1Out  
+ }}'''
+
 req_graphql_vol24h_rot = '''{
   pairHourDatas(
-    where: {hourStartUnix_gt: TIMESTAMP_MINUS_24_H, pair: "0x53f64be99da00fec224eaf9f8ce2012149d2fc88"})
+    where: {hourStartUnix_gt: TIMESTAMP_MINUS_24_H, pair: "0x5a265315520696299fa1ece0701c3a1ba961b888"})
     {
     hourlyVolumeUSD
   }
@@ -90,15 +109,11 @@ graphql_client_uni_2 = GraphQLClient('https://api.thegraph.com/subgraphs/name/un
 graphql_client_eth = GraphQLClient('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks')
 
 # log_file
-price_file_path = BASE_PATH + 'nice/log_files/price_hist.txt'
-supply_file_path = BASE_PATH + 'nice/log_files/supply_hist.txt'
-chart_price_file_path = BASE_PATH + 'nice/log_files/chart_price.png'
-chart_supply_file_path = BASE_PATH + 'nice/log_files/chart_supply.png'
-candels_file_path = BASE_PATH + 'nice/log_files/chart_candles.png'
-david_logs_file_path = BASE_PATH + 'nice/log_files/david_logs.txt'
-greg_logs_file_path = BASE_PATH + 'nice/log_files/greg_logs.txt'
-tim_logs_file_path = BASE_PATH + 'nice/log_files/tim_logs.txt'
-schizo_logs_file_path = BASE_PATH + 'nice/log_files/schizo_logs.txt'
+price_file_path = BASE_PATH + 'rot/log_files/price_hist.txt'
+supply_file_path = BASE_PATH + 'rot/log_files/supply_hist.txt'
+chart_price_file_path = BASE_PATH + 'rot/log_files/chart_price.png'
+chart_supply_file_path = BASE_PATH + 'rot/log_files/chart_supply.png'
+candels_file_path = BASE_PATH + 'rot/log_files/chart_candles.png'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
@@ -109,32 +124,59 @@ telegram_governance_url = 't.me/rottengovernance'
 rotten_main_chat_id = -1001382715556
 last_time_checked_price_chart = 0
 last_time_checked_price_candles = 0
+last_time_checked_price_price = 0
 last_time_checked_price_supply = 0
 last_time_checked_4chan = 0
 last_time_checked_twitter = 0
 
-re_4chan = re.compile(r'/NICE+/|NICE')
+re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting|ROT')
 
 twitter = Twython(APP_KEY, APP_SECRET, ACCESS_TOKEN, ACCESS_SECRET_TOKEN)
 
 how_many_tweets = 5
 
 ## CONTRACT
-nice_contract = '0x53f64be99da00fec224eaf9f8ce2012149d2fc88'
-nice_contract_formatted_uni = "0x53f64be99da00fec224eaf9f8ce2012149d2fc88"
+rot_contract = '0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
+rot_contract_formatted_uni = "0xd04785c4d8195e4a54d9dec3a9043872875ae9e2"
+maggot_contract = '0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89'
 
 # messages
+rot_101_text = '''<br>ROT IN A NUTSHELL
 
-url_website = 'niceee.org'
-url_uniswap_nice = 'https://app.uniswap.org/#/swap?inputCurrency=0x53f64be99da00fec224eaf9f8ce2012149d2fc88'
-url_uniswap_pool_nice_eht = 'https://app.uniswap.org/#/add/ETH/0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
-url_etherscan_rot = 'https://etherscan.io/token/0x53f64be99da00fec224eaf9f8ce2012149d2fc88'
-url_astrotools_rot = 'https://app.astrotools.io/pair-explorer/0x53f64be99da00fec224eaf9f8ce2012149d2fc88'
-url_dextools_rot = 'https://www.dextools.io/app/uniswap/pair-explorer/0x53f64be99da00fec224eaf9f8ce2012149d2fc88'
+$ROT is a deflationary token. 
+In each $ROT transaction 2.5% is burned into $MAGGOTS. 
+
+> IF the transaction is BUY:
+The 2.5% will be converted into MAGGOTS and deposited into your wallet.
+
+> IF the transaction is SELL:
+The 2.5% will be converted into MAGGOTS and deposited in the $MAGGOT warehouse. Basically, when you sell, 2.5% of $ROT is burned, but you don't get $MAGGOT.
+
+> DEFLATION VS. INFLATION
+$ROT is a deflationary token. Pools generate 100 new ROTs in each block.If there are enough buy/sell transactions of $ROT, even if 100ROT/block are created, it will still be deflationary. 
+
+If there are enough buy/sell transactions of $ROT, even if 100ROT/block are created, $ROT will still be deflationary. 
+
+If there were not enough transactions, $ROT would increase its amount. 
+
+The $MAGGOTS are inflationary. These tokens are initially worthless but now have some value due to the liquidity of the pools. $MAGGOT is usually used to stake the ROT-MAGGOT pair or to exchange them for $ROT, but you can do with them whatever you want.'''
+
+url_website = 'rottenswap.org'
+url_uniswap_rot = 'https://app.uniswap.org/#/swap?inputCurrency=0xd04785c4d8195e4a54d9dec3a9043872875ae9e2'
+url_uniswap_maggot = 'https://app.uniswap.org/#/swap?inputCurrency=0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89'
+url_uniswap_pool_rot_eht = 'https://app.uniswap.org/#/add/ETH/0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
+url_uniswap_pool_rot_maggot = 'https://app.uniswap.org/#/add/0x163c754eF4D9C03Fc7Fa9cf6Dd43bFc760E6Ce89/0xD04785C4d8195e4A54d9dEc3a9043872875ae9E2'
+url_etherscan_rot = 'https://etherscan.io/token/0xd04785c4d8195e4a54d9dec3a9043872875ae9e2'
+url_etherscan_maggot = 'https://etherscan.io/token/0x163c754ef4d9c03fc7fa9cf6dd43bfc760e6ce89'
+url_astrotools_rot = 'https://app.astrotools.io/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888'
+url_dextools_rot = 'https://www.dextools.io/app/uniswap/pair-explorer/0x5a265315520696299fa1ece0701c3a1ba961b888'
 url_coingecko_rot = 'https://www.coingecko.com/en/coins/rotten'
 url_livecoinwatch_rot = 'https://www.livecoinwatch.com/price/Rotten-ROT'
-url_twitter_rottenswap = 'https://twitter.com/thetimtempleton'
+url_twitter_rottenswap = 'https://twitter.com/rottenswap'
+url_reddit_rottenswap = 'https://www.reddit.com/r/RottenSwap/'
 url_coinmarketcap = 'https://coinmarketcap.com/currencies/rotten/'
+url_merch_site1 = 'https://rottenswag.com/'
+url_merch_site2 = 'https://rottenmerch.launchcart.store/shop'
 
 
 def create_href_str(url, message):
@@ -142,17 +184,23 @@ def create_href_str(url, message):
 
 
 links = '<b>Website:</b> ' + create_href_str(url_website, 'rottenswap.org') + '\n' \
-        + '<b>Uniswap:</b> ' + create_href_str(url_uniswap_nice, "$ROT") + '\n' \
-        + '<b>Pools:</b> ' + create_href_str(url_uniswap_pool_nice_eht, 'ROT-ETH') + ' ' + '\n' \
-        + '<b>Etherscan:</b> ' + create_href_str(url_etherscan_rot, '$ROT') + " " + '\n' \
+        + '<b>Uniswap:</b> ' + create_href_str(url_uniswap_rot, "$ROT") + " " + create_href_str(url_uniswap_maggot,
+                                                                                                '$MAGGOT') + '\n' \
+        + '<b>Pools:</b> ' + create_href_str(url_uniswap_pool_rot_eht, 'ROT-ETH') + ' ' + create_href_str(
+    url_uniswap_pool_rot_maggot, 'ROT-MAGGOT') + '\n' \
+        + '<b>Etherscan:</b> ' + create_href_str(url_etherscan_rot, '$ROT') + " " + create_href_str(
+    url_etherscan_maggot, '$MAGGOT') + '\n' \
         + '<b>Charts:</b> ' + create_href_str(url_astrotools_rot, 'Astrotools') + ' ' + create_href_str(
     url_dextools_rot, 'DexTools') + ' ' \
         + create_href_str(url_coingecko_rot, 'CoinGecko') + ' ' + create_href_str(url_livecoinwatch_rot,
                                                                                   'LiveCoinWatch') + ' ' + create_href_str(
     url_coinmarketcap, 'CoinMarketCap') + '\n' \
-        + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + '\n' \
- \
-    # GIT INIT
+        + '<b>Social medias: </b>' + create_href_str(url_twitter_rottenswap, 'Twitter') + ' ' + create_href_str(
+    url_reddit_rottenswap, 'Reddit') + ' ' + create_href_str("https://discord.gg/WFp5sQ", 'Discord') + '\n' \
+        + '<b>Merch: </b>' + create_href_str(url_merch_site1, 'RottenSwag') + ' ' + create_href_str(url_merch_site2, 'RottenMerch') + '\n' \
+        + '<b>Telegram groups:</b> @rottengovernance @rottenhelpgroup @RottenHalloween @RottenNFTs @ROTGamblingDapp 中國 -> @RottenSwapCN @RottenSwapAR - القناة العربية'
+
+# GIT INIT
 repo = Repo(MEME_GIT_REPO)
 assert not repo.bare
 repo.config_reader()  # get a config reader for read-only access
@@ -181,7 +229,7 @@ def format_tweet(tweet):
 
 # scraps the github project to get those sweet memes. Will chose one randomly and send it.
 def get_url_meme():
-    contents = requests.get("https://api.github.com/repos/niceeeeeeeeeee/memes/contents/memesFolder").json()
+    contents = requests.get("https://api.github.com/repos/rottenswap/memes/contents/memesFolder").json()
     potential_memes = []
     for file in contents:
         if ('png' in file['name'] or 'jpg' in file['name'] or 'jpeg' in file['name'] or 'mp4' in file['name']):
@@ -206,7 +254,7 @@ def how_to_slippage(update: Update, context: CallbackContext):
 def get_supply_cap_raw(contract_addr):
     base_addr = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=' + contract_addr + '&apikey=' + etherscan_api_key
     decimals = 1000000000000000000
-    supply_cap = float(requests.post(base_addr).json()['result']) / decimals
+    supply_cap = round(int(requests.post(base_addr).json()['result']) / decimals)
     return supply_cap
 
 
@@ -217,8 +265,10 @@ def number_to_beautiful(nbr):
 
 # Get the supply cache from etherscan. Uses the ETH_API_KEY passed as an env variable.
 def get_supply_cap(update: Update, context: CallbackContext):
-    number_nice = str(round(get_supply_cap_raw(nice_contract)))
-    message = "It's <b>NICE</b> around here! There are <pre>" + number_nice + "</pre> NICE tokens"
+    number_rot = number_to_beautiful(get_supply_cap_raw(rot_contract))
+    number_maggots = number_to_beautiful(get_supply_cap_raw(maggot_contract))
+    message = "It's <b>ROTTING</b> around here! There are <pre>" + str(number_rot) + "</pre> ROTS and <pre>" + str(
+        number_maggots) + "</pre> MAGGOTS"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
@@ -243,6 +293,7 @@ def get_biz_threads():
                 print("ERROR")
                 pass
             else:
+                # if(("rot" or "$rot" or "rotten" or "rotting") in (sub.lower() or com.lower())):
                 if re_4chan.search(com.lower()) or re_4chan.search(sub.lower()):
                     id = thread['no']
                     threads_ids.append((id, com, sub))
@@ -328,9 +379,9 @@ def callback_timer(update: Update, context: CallbackContext):
 
 def query_tweets(easy=True):
     if easy:
-        return twitter.search(q='$NICE')
+        return twitter.search(q='$ROT rottenswap')
     else:
-        return twitter.search(q='$NICE')
+        return twitter.search(q='$ROT')
 
 
 def filter_tweets(all_tweets):
@@ -357,7 +408,7 @@ def get_last_tweets(update: Update, context: CallbackContext):
         except TwythonError:
             time.sleep(0.5)
             results = query_tweets(False)
-        message = "<b>Normies are tweeting about NICE, go comment/like/RT:</b>\n"
+        message = "<b>Normies are tweeting about ROT, go comment/like/RT:</b>\n"
         rest_message = filter_tweets(results)
         if rest_message == "":
             print("empty tweets, fallback")
@@ -483,7 +534,7 @@ def get_number_holder_token(token):
 
 # graphql queries
 
-def get_price_nice_raw():
+def get_price_rot_raw():
     now = int(time.time())
 
     before_7d = now - 3600 * 24 * 7
@@ -500,7 +551,7 @@ def get_price_nice_raw():
     block_from_1d = int(json_resp_eth['data']['t2'][0]['number'])
     latest_block = int(json_resp_eth['data']['tnow'][0]['number'])
 
-    query_uni_updated = query_uni.replace("CONTRACT", nice_contract_formatted_uni) \
+    query_uni_updated = query_uni.replace("CONTRACT", rot_contract_formatted_uni) \
         .replace("NUMBER_T1", str(block_from_7d)) \
         .replace("NUMBER_T2", str(block_from_1d)) \
         .replace("NUMBER_TNOW", str(latest_block))
@@ -511,28 +562,27 @@ def get_price_nice_raw():
     # pprint.pprint(json_resp_uni)
 
     try:
-        rot_per_eth_now = float(json_resp_uni['data']['tnow']['derivedETH'])
+        rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     except KeyError:  # trying again, as sometimes the block that we query has not yet been indexed. For that, we read
         # the error message returned by uniswap and work on the last indexed block that is return in the error message
         # TODO: work with regex as block numbers can be < 10000000
         last_block_indexed = str(res_uni_query).split('indexed up to block number ')[1][0:8]
-        query_uni_updated = query_uni.replace("CONTRACT", nice_contract_formatted_uni) \
+        query_uni_updated = query_uni.replace("CONTRACT", rot_contract_formatted_uni) \
             .replace("NUMBER_T1", str(block_from_7d)) \
             .replace("NUMBER_T2", str(block_from_1d)) \
             .replace("NUMBER_TNOW", str(last_block_indexed))
         res_uni_query = graphql_client_uni.execute(query_uni_updated)
         json_resp_uni = json.loads(res_uni_query)
-        rot_per_eth_now = float(json_resp_uni['data']['tnow']['derivedETH'])
+        rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
 
-    rot_per_eth_7d = 0.0  # float(json_resp_uni['data']['t1']['derivedETH'])
+    # rot_per_eth_7d = float(json_resp_uni['data']['t1']['derivedETH'])
     rot_per_eth_1d = float(json_resp_uni['data']['t2']['derivedETH'])
     rot_per_eth_now = float(json_resp_uni['data']['tnow']['derivedETH'])
-
     eth_price_7d = float(json_resp_uni['data']['b1']['ethPrice'])
     eth_price_1d = float(json_resp_uni['data']['b2']['ethPrice'])
     eth_price_now = float(json_resp_uni['data']['bnow']['ethPrice'])
 
-    rot_price_7d_usd = 0.0  # rot_per_eth_7d * eth_price_7d
+    rot_price_7d_usd = rot_per_eth_7d * eth_price_7d
     rot_price_1d_usd = rot_per_eth_1d * eth_price_1d
     rot_price_now_usd = rot_per_eth_now * eth_price_now
 
@@ -554,8 +604,50 @@ def get_ratio_rot_per_maggot(last_swaps_maggot_rot_pair):
         return last_swaps_amount_rot_in / last_swaps_amount_maggot_out
 
 
+def get_price_maggot_raw():
+    resp_maggot = graphql_client_uni.execute(req_graphql_maggot)
+
+    rot_per_maggot = get_ratio_rot_per_maggot(json.loads(resp_maggot))
+
+    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
+     rot_price_now_usd) = get_price_rot_raw()
+
+    dollar_per_maggot = rot_price_now_usd * rot_per_maggot
+    eth_per_maggot = derivedETH_now * rot_per_maggot
+
+    return eth_per_maggot, dollar_per_maggot, rot_per_maggot
+
+
+def get_price_maggot(update: Update, context: CallbackContext):
+    (eth_per_maggot, dollar_per_maggot, rot_per_maggot) = get_price_maggot_raw()
+
+    supply_cap_maggot = get_supply_cap_raw(maggot_contract)
+    supply_cat_pretty = number_to_beautiful(supply_cap_maggot)
+    market_cap = number_to_beautiful(int(float(supply_cap_maggot) * dollar_per_maggot))
+
+    maggot_per_rot = 1 / rot_per_maggot
+
+    holders = get_number_holder_token(maggot_contract)
+    message = ""
+
+    if str(dollar_per_maggot)[0:10] == "0.07514950":
+        message = message + "Parts of Uniswap info seems down. Price might be outdated.\n"
+
+    message = message + "<code>(MAGGOT) MaggotToken" \
+              + "\nETH: Ξ" + str(eth_per_maggot)[0:10] \
+              + "\nUSD: $" + str(dollar_per_maggot)[0:10] \
+              + "\n" \
+              + "\n1ROT    = " + str(maggot_per_rot)[0:4] + " MAGGOT" \
+              + "\nS.  Cap = " + supply_cat_pretty \
+              + "\nM.  Cap = $" + market_cap \
+              + "\nHolders = " + str(holders) + "</code>"
+
+    chat_id = update.message.chat_id
+    context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
+
+
 # return price 7 days ago, price 1 day ago, volume last 24h
-def get_volume_24h_nice():
+def get_volume_24h_rot():
     now = int(time.time())
     yesterday = now - 3600 * 24
 
@@ -574,16 +666,24 @@ def get_volume_24h_nice():
     return amount
 
 
-def get_price_nice(update: Update, context: CallbackContext):
-    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
-     rot_price_now_usd) = get_price_nice_raw()
+def get_price_rot(update: Update, context: CallbackContext):
 
-    supply_cap_rot = get_supply_cap_raw(nice_contract)
-    supply_cat_pretty = str(round(supply_cap_rot))
+    global last_time_checked_price_price
+    new_time = round(time.time())
+    small_format = True
+    if new_time - last_time_checked_price_price > 60:
+        last_time_checked_price_price = new_time
+        small_format = False
+
+
+    (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now, rot_price_now_usd) = get_price_rot_raw()
+
+    supply_cap_rot = get_supply_cap_raw(rot_contract)
+    supply_cat_pretty = number_to_beautiful(supply_cap_rot)
     market_cap = number_to_beautiful(int(float(supply_cap_rot) * rot_price_now_usd))
 
-    vol_24h = get_volume_24h_nice()
-    var_7d = 0  # int(((rot_price_now_usd - rot_price_7d_usd) / rot_price_now_usd) * 100)
+    vol_24h = get_volume_24h_rot()
+    var_7d = int(((rot_price_now_usd - rot_price_7d_usd) / rot_price_now_usd) * 100)
     var_1d = int(((rot_price_now_usd - rot_price_1d_usd) / rot_price_now_usd) * 100)
 
     var_7d_str = "+" + str(var_7d) + "%" if var_7d > 0 else str(var_7d) + "%"
@@ -591,25 +691,23 @@ def get_price_nice(update: Update, context: CallbackContext):
 
     vol_24_pretty = number_to_beautiful(vol_24h)
 
-    holders = get_number_holder_token(nice_contract)
+    holders = get_number_holder_token(rot_contract)
 
     message = ""
-    if str(rot_price_now_usd)[0:10] == "8559.66467":
-        message = message + "Parts of Uniswap info seems down. Price might be outdated.\n"
 
-        # + "\nETH: Ξ" + str(derivedETH_now)[0:10]
-        # + "\nUSD: $" + str(rot_price_now_usd)[0:10]
-
-    message = message + "<code>(NICE) NiceToken" \
-              + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
-              + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
-              + "\n24H:  " + var_1d_str \
-              + "\n7D :  " + var_7d_str \
-              + "\n" \
-              + "\nVol 24H = $" + vol_24_pretty \
-              + "\nS.  Cap = " + supply_cat_pretty \
-              + "\nM.  Cap = $" + market_cap \
-              + "\nHolders = " + str(holders) + "</code>"
+    if small_format:
+        message = message + "<code>(ROT) USD: $" + str(rot_price_now_usd)[0:7] + "</code>"
+    else:
+        message = message + "<code>(ROT) RottenToken" \
+                  + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
+                  + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
+                  + "\n24H:  " + var_1d_str \
+                  + "\n7D :  " + var_7d_str \
+                  + "\n" \
+                  + "\nVol 24H = $" + vol_24_pretty \
+                  + "\nS.  Cap = " + supply_cat_pretty \
+                  + "\nM.  Cap = $" + market_cap \
+                  + "\nHolders = " + str(holders) + "</code>"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
@@ -617,7 +715,7 @@ def get_price_nice(update: Update, context: CallbackContext):
 def log_current_price_rot_per_usd():
     global price_file_path
     (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
-     rot_price_now_usd) = get_price_nice_raw()
+     rot_price_now_usd) = get_price_rot_raw()
     with open(price_file_path, "a") as price_file:
         time_now = datetime.now()
         date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
@@ -627,11 +725,12 @@ def log_current_price_rot_per_usd():
 
 def log_current_supply():
     global supply_file_path
-    number_rot = get_supply_cap_raw(nice_contract)
+    number_rot = get_supply_cap_raw(rot_contract)
+    number_maggots = get_supply_cap_raw(maggot_contract)
     with open(supply_file_path, "a") as supply_file:
         time_now = datetime.now()
         date_time_str = time_now.strftime("%m/%d/%Y,%H:%M:%S")
-        message_to_write = date_time_str + " " + str(number_rot) + " " + "\n"
+        message_to_write = date_time_str + " " + str(number_rot) + " " + str(number_maggots) + "\n"
         supply_file.write(message_to_write)
 
 
@@ -678,7 +777,7 @@ Con.Adr = 0xd04...9e2
 #     else:
 #         if id_last_proposal > last_proposal_received_id:
 #             last_proposal_received_id = id_last_proposal
-#             proposal_title = last_proposal['title']
+#             proposal_title = print_candlesticklast_proposal['title']
 #             description = last_proposal['description']
 #             message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
 #                       + description + '\nGo vote at ' \
@@ -736,7 +835,7 @@ def print_chart_price(dates_raw, price):
     plt.close(f)
 
 
-def print_chart_supply(dates_raw, supply_rot):
+def print_chart_supply(dates_raw, supply_rot, supply_maggot):
     dates = matplotlib.dates.date2num(dates_raw)
     cb91_green = '#47DBCD'
     plt.style.use('dark_background')
@@ -746,6 +845,7 @@ def print_chart_supply(dates_raw, supply_rot):
 
     ax = f.add_subplot(111)
     ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+    plot1 = ax.plot_date(dates, supply_maggot, 'r', label='maggot')
 
     ax2 = ax.twinx()
     ax2.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
@@ -754,7 +854,7 @@ def print_chart_supply(dates_raw, supply_rot):
     ax.set_ylabel("Maggot")
     ax2.set_ylabel("Rot")
 
-    plots = plot2
+    plots = plot1 + plot2
     labs = [l.get_label() for l in plots]
     ax.legend(plots, labs, bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
               ncol=2, mode="expand", borderaxespad=0.)
@@ -810,7 +910,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
                                    parse_mode="html")
         else:
             context.bot.send_message(chat_id=chat_id,
-                                     text="Displaying charts only once every minute. Don't abuse this NICE function")
+                                     text="Displaying charts only once every minute. Don't abuse this function")
     else:
         context.bot.send_message(chat_id=chat_id,
                                  text="Request badly formated. Please use /getchart time type (example: /getchart 3 h for the last 3h time range). Simply editing your message will not work, please send a new correctly formated message.")
@@ -818,7 +918,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
 
 def check_query(query_received):
     query_ok, simple_query = True, False
-    time_type, time_start, k_hours, k_days, token = 'd', 1, 0, 1, "NICE"
+    time_type, time_start, k_hours, k_days, token = 'd', 7, 0, 7, "ROT"
     if len(query_received) == 1:
         simple_query = True
     elif len(query_received) == 2:
@@ -856,9 +956,8 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
             last_price = graphs_util.print_candlestick(token, t_from, t_to, candels_file_path)
 
             caption = "Price of the last " + str(time_start) + str(time_type) + " of " + token + \
-                      ".\nCurrent price: <pre>$" + str(last_price)[0:10] + "</pre>" + \
-                      '\nData from <a href="chartex.pro">chartex.pro</a>. Want this bot for your token? contact @ ' \
-                      'rotted_ben. '
+                      ".\nCurrent price: <pre>$" + str(last_price)[0:7] + "</pre>" + \
+                      '\nWant this bot on your tg? -> contact @ rotted_ben.'
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
@@ -893,7 +992,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
             with open(supply_file_path, newline='') as csvfile:
                 spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
                 for row in spamreader:
-                    list_time_supply.append((row[0], row[1]))
+                    list_time_supply.append((row[0], row[1], row[2]))
 
             now = datetime.utcnow()
 
@@ -901,15 +1000,17 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
                                now - strp_date(x[0]) < timedelta(days=k_days, hours=k_hours)]
 
             dates_pure = keep_dates(filtered_values)
-            supply_rot = [float(value[1]) for value in filtered_values]
+            supply_rot = [int(value[1]) for value in filtered_values]
+            supply_maggot = [int(value[2]) for value in filtered_values]
 
-            print_chart_supply(dates_pure, supply_rot)
-            current_rot_str = str(round(supply_rot[-1]))
+            print_chart_supply(dates_pure, supply_rot, supply_maggot)
+            current_rot_str = number_to_beautiful(supply_rot[-1])
+            current_maggot_str = number_to_beautiful(supply_maggot[-1])
             if simple_query:
-                caption = "Chart since the bot starting logging the supply.\nCurrent supply of <b>NICE:</b> <pre>" + current_rot_str + "</pre>"
+                caption = "Chart since the bot starting logging the supply.\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
             else:
                 caption = "Supply of the last " + str(time_start) + str(
-                    time_type) + ".\nCurrent supply: \n<b>NICE:</b> <pre>" + current_rot_str
+                    time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(chart_supply_file_path, 'rb'),
@@ -936,163 +1037,28 @@ def get_airdrop(update: Update, context: CallbackContext):
                              disable_web_page_preview=True)
 
 
-def check_message_david(update: Update, context: CallbackContext):
-    try:
-        if update.message.from_user.username == 'cupckke':
-            with open(david_logs_file_path, "a") as price_file:
-                message_to_write = str(update.message.message_id) + "///))()" + str(update.message.text).replace("\n",
-                                                                                                                 " ") + "\n"
-                price_file.write(message_to_write)
-        elif update.message.from_user.username == 'WNoailles':
-            with open(schizo_logs_file_path, "a") as price_file:
-                message_to_write = str(update.message.message_id) + "///))()" + str(update.message.text).replace("\n",
-                                                                                                                 " ") + "\n"
-                price_file.write(message_to_write)
-        elif update.message.from_user.username == 'timtemplet':
-            with open(tim_logs_file_path, "a") as price_file:
-                message_to_write = str(update.message.message_id) + "///))()" + str(update.message.text).replace("\n",
-                                                                                                                 " ") + "\n"
-                price_file.write(message_to_write)
-        elif update.message.from_user.username == 'FotanEnergy':
-            with open(greg_logs_file_path, "a") as price_file:
-                message_to_write = str(update.message.message_id) + "///))()" + str(update.message.text).replace("\n",
-                                                                                                                 " ") + "\n"
-                price_file.write(message_to_write)
-    except AttributeError:
-        pass
-
-
-def generate_random_message_raw(filepath):
-    with open(david_logs_file_path) as f:
-        msgs = [line.rstrip().split('///))()')[1] for line in f]
-    msg = ' '.join(msgs)
-    text_model = markovify.Text(msg)
-    return text_model.make_short_sentence(400)
-
-
-def get_random_message_david(update: Update, context: CallbackContext):
-    with open(david_logs_file_path) as f:
-        msgs = [line.rstrip().split('///))()') for line in f]
-    selected_message = random.choice(msgs)
-    context.bot.send_message(text=selected_message[1],
-                             reply_to_message_id=selected_message[0],
-                             chat_id=update.message.chat_id,
-                             disable_web_page_preview=True)
-
-
-def get_random_message_tim(update: Update, context: CallbackContext):
-    with open(tim_logs_file_path) as f:
-        msgs = [line.rstrip().split('///))()') for line in f]
-    selected_message = random.choice(msgs)
-    context.bot.send_message(text=selected_message[1],
-                             reply_to_message_id=selected_message[0],
-                             chat_id=update.message.chat_id,
-                             disable_web_page_preview=True)
-
-
-def get_random_message_schizo(update: Update, context: CallbackContext):
-    with open(schizo_logs_file_path) as f:
-        msgs = [line.rstrip().split('///))()') for line in f]
-    selected_message = random.choice(msgs)
-    context.bot.send_message(text=selected_message[1],
-                             reply_to_message_id=selected_message[0],
-                             chat_id=update.message.chat_id,
-                             disable_web_page_preview=True)
-
-
-def generate_random_david(update: Update, context: CallbackContext):
-    res = generate_random_message_raw(david_logs_file_path)
-    if random.randrange(10) == 5:
-        res = '<a href="https://app.rarible.com/token/0xd07dc4262bcdbf85190c01c996b4c06a461d2430:37562:0xd08517cd0372cd12b710a554f5025cfd419b43ff">' + res + '</a>'
-    context.bot.send_message(text=res,
-                             chat_id=update.message.chat_id,
-                             disable_web_page_preview=True,
-                             parse_mode="html")
-
-
-def generate_random_gregg(update: Update, context: CallbackContext):
-    with open(greg_logs_file_path) as f:
-        msgs = [line.rstrip().split('///))()')[1] for line in f]
-    msg = ' '.join(msgs)
-    text_model = markovify.Text(msg)
-    res = text_model.make_short_sentence(280)
-    context.bot.send_message(text=res,
-                             chat_id=update.message.chat_id,
-                             disable_web_page_preview=True,
-                             parse_mode="html")
-
-
-def generate_random_all_raw():
-    with open(david_logs_file_path) as f:
-        davids = [line.rstrip().split('///))()')[1] for line in f]
-    with open(tim_logs_file_path) as f:
-        tims = [line.rstrip().split('///))()')[1] for line in f]
-    with open(schizo_logs_file_path) as f:
-        schizos = [line.rstrip().split('///))()')[1] for line in f]
-    david_msg = ' '.join(davids)
-    tim_msg = ' '.join(tims)
-    schizo_msg = ' '.join(schizos)
-    all_mixed = tim_msg + david_msg + schizo_msg
-    text_model = markovify.Text(all_mixed)
-    return text_model.make_short_sentence(400)
-
-
-def generate_random_all(update: Update, context: CallbackContext):
-    res = generate_random_all_raw()
-    context.bot.send_message(text=res,
-                             chat_id=update.message.chat_id,
-                             disable_web_page_preview=True)
-
-
-def generate_random_all_stats(update: Update, context: CallbackContext):
-    with open(david_logs_file_path) as f:
-        davids = [line.rstrip().split('///))()')[1] for line in f]
-    with open(tim_logs_file_path) as f:
-        tims = [line.rstrip().split('///))()')[1] for line in f]
-    with open(schizo_logs_file_path) as f:
-        schizos = [line.rstrip().split('///))()')[1] for line in f]
-    david_msg = ' '.join(davids)
-    tim_msg = ' '.join(tims)
-    schizo_msg = ' '.join(schizos)
-    percent_david = len(david_msg) / (len(david_msg) + len(tim_msg) + len(schizo_msg))
-    percent_tim = len(tim_msg) / (len(david_msg) + len(tim_msg) + len(schizo_msg))
-    percent_schizo = len(schizo_msg) / (len(david_msg) + len(tim_msg) + len(schizo_msg))
-    text = "Percentage of message logged by user: \n" \
-           + "david: " + str(round(percent_david * 100)) + "\n" \
-           + "tim: " + str(round(percent_tim * 100)) + "\n" \
-           + "schizo: " + str(round(percent_schizo * 100))
-    context.bot.send_message(text=text,
-                             chat_id=update.message.chat_id,
-                             disable_web_page_preview=True)
-
-
 def main():
     updater = Updater(TELEGRAM_KEY, use_context=True)
     dp = updater.dispatcher
-    dp.add_handler(CommandHandler('niceme', send_meme_to_chat))
-    # dp.add_handler(CommandHandler('links', get_links))
-    dp.add_handler(CommandHandler('nicefarmingguide', stake_command))
-    # dp.add_handler(CommandHandler('howtoslippage', how_to_slippage))
+    dp.add_handler(CommandHandler('rotme', send_meme_to_chat))
+    dp.add_handler(CommandHandler('links', get_links))
+    dp.add_handler(CommandHandler('rotfarmingguide', stake_command))
+    dp.add_handler(CommandHandler('howtoslippage', how_to_slippage))
     dp.add_handler(CommandHandler('supplycap', get_supply_cap))
     dp.add_handler(CommandHandler('biz', get_biz))
     dp.add_handler(CommandHandler('twitter', get_last_tweets))
     dp.add_handler(MessageHandler(Filters.photo, handle_new_image))
-    dp.add_handler(CommandHandler('nice', get_price_nice))
-    # dp.add_handler(CommandHandler('help', get_help))
+    dp.add_handler(CommandHandler('rot', get_price_rot))
+    dp.add_handler(CommandHandler('maggot', get_price_maggot))
+    dp.add_handler(CommandHandler('help', get_help))
+    dp.add_handler(CommandHandler('fake_price', get_fake_price))
     dp.add_handler(CommandHandler('chart', get_chart_price_pyplot))
     dp.add_handler(CommandHandler('chartSupply', get_chart_supply_pyplot))
-    # dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
+    dp.add_handler(CommandHandler('startBiz', callback_timer, pass_job_queue=True))
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(CommandHandler('candlestick', get_candlestick_pyplot))
-    # dp.add_handler(CommandHandler('airdropinfo', get_airdrop))
-    dp.add_handler(CommandHandler('david', get_random_message_david))
-    dp.add_handler(CommandHandler('tim', get_random_message_tim))
-    dp.add_handler(CommandHandler('schizo', get_random_message_schizo))
-    dp.add_handler(CommandHandler('generate_random_david', generate_random_david))
-    dp.add_handler(CommandHandler('generate_random_gregg', generate_random_gregg))
-    dp.add_handler(CommandHandler('generate_random_david_tim_schizo', generate_random_all))
-    dp.add_handler(CommandHandler('generate_random_all_stats', generate_random_all_stats))
-    dp.add_handler(MessageHandler(Filters.text, check_message_david))
+    dp.add_handler(CommandHandler('airdropinfo', get_airdrop))
+    # dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
     RepeatedTimer(15, log_current_price_rot_per_usd)
     RepeatedTimer(60, log_current_supply)
     updater.start_polling()
@@ -1103,14 +1069,19 @@ if __name__ == '__main__':
     main()
 
 commands = """
-nice - Display some $NICE price
-niceme - Give me a random meme
-twitter - Fetch tweets talking about §NICE
-biz - Get 4chan biz threads talking about $NICE
-nicefarmingguide - Guide to farming with tegrity
-supplycap - How NICE are we
+rot - Display the $ROT price
+maggot - Display the $MAGGOT price
+help - Technical issues? A question? Need help?
+rotme - Give me a random meme
+links - Main links
+rotfarmingguide - Guide to $ROT farming
+howtoslippage - How to increase slippage
+supplycap - How ROTTED are we
+biz - List biz thread
+twitter - List twitter threads
 add_meme - Add a meme to the common memes folder
 chart - Display a (simple) price chart
 chartsupply - Display a graph of the supply cap
 candlestick - Candlestick chart 
+airdropinfo - Info about the airdrop
 """
