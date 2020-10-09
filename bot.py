@@ -670,11 +670,11 @@ def get_price_rot(update: Update, context: CallbackContext):
 
     global last_time_checked_price_price
     new_time = round(time.time())
-    small_format = False
+    small_format = True
     pprint.pprint(new_time - last_time_checked_price_price)
     if new_time - last_time_checked_price_price > 60:
         last_time_checked_price_price = new_time
-        small_format = True
+        small_format = False
 
 
     (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now, rot_price_now_usd) = get_price_rot_raw()
