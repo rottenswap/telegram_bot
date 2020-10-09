@@ -124,6 +124,7 @@ telegram_governance_url = 't.me/rottengovernance'
 rotten_main_chat_id = -1001382715556
 last_time_checked_price_chart = 0
 last_time_checked_price_candles = 0
+last_time_checked_price_price = 0
 last_time_checked_price_supply = 0
 last_time_checked_4chan = 0
 last_time_checked_twitter = 0
@@ -666,6 +667,15 @@ def get_volume_24h_rot():
 
 
 def get_price_rot(update: Update, context: CallbackContext):
+    
+    global last_time_checked_price_price
+    new_time = round(time.time())
+    small_format = False
+    if new_time - last_time_checked_price_price > 60:
+        last_time_checked_price_price = new_time
+        small_format = True
+
+
     (derivedETH_7d, rot_price_7d_usd, derivedETH_1d, rot_price_1d_usd, derivedETH_now,
      rot_price_now_usd) = get_price_rot_raw()
 
@@ -685,20 +695,21 @@ def get_price_rot(update: Update, context: CallbackContext):
     holders = get_number_holder_token(rot_contract)
 
     message = ""
-    if str(rot_price_now_usd)[0:10] == "0.13587689":
-        message = message + "Parts of Uniswap info seems down. Price might be outdated.\n"
-
-
-    message = message + "<code>(ROT) RottenToken" \
-              + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
-              + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
-              + "\n24H:  " + var_1d_str \
-              + "\n7D :  " + var_7d_str \
-              + "\n" \
-              + "\nVol 24H = $" + vol_24_pretty \
-              + "\nS.  Cap = " + supply_cat_pretty \
-              + "\nM.  Cap = $" + market_cap \
-              + "\nHolders = " + str(holders) + "</code>"
+    
+    if small_format:
+        message = message + "<code>(ROT) RottenToken (more info only once per minute)" \
+                   + "\nUSD: $" + str(rot_price_now_usd)[0:10] 
+    else:
+        message = message + "<code>(ROT) RottenToken" \
+                  + "\nETH: Ξ" + str(derivedETH_now)[0:10] \
+                  + "\nUSD: $" + str(rot_price_now_usd)[0:10] \
+                  + "\n24H:  " + var_1d_str \
+                  + "\n7D :  " + var_7d_str \
+                  + "\n" \
+                  + "\nVol 24H = $" + vol_24_pretty \
+                  + "\nS.  Cap = " + supply_cat_pretty \
+                  + "\nM.  Cap = $" + market_cap \
+                  + "\nHolders = " + str(holders) + "</code>"
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
