@@ -671,6 +671,7 @@ def get_price_rot(update: Update, context: CallbackContext):
     global last_time_checked_price_price
     new_time = round(time.time())
     small_format = False
+    pprint.pprint(new_time - last_time_checked_price_price)
     if new_time - last_time_checked_price_price > 60:
         last_time_checked_price_price = new_time
         small_format = True
