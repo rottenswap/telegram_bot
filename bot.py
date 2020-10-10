@@ -127,6 +127,7 @@ last_time_checked_price_candles = 0
 last_time_checked_price_price = 0
 last_time_checked_price_supply = 0
 last_time_checked_4chan = 0
+last_time_checked = 0
 last_time_checked_twitter = 0
 
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting|ROT')
@@ -757,34 +758,36 @@ Con.Adr = 0xd04...9e2
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
 
-# def check_new_proposal(update: Update, context: CallbackContext):
-#     global last_proposal_received_id
-#     global last_time_checked
-#
-#     new_time = round(time.time())
-#     if new_time - last_time_checked > 60:
-#         pass
-# print("Checking for new proposals...")
-# log_current_price_rot_per_usd()
-# log_current_supply()
-# last_time_checked = new_time
-# response_json = requests.get(api_proposal_url).json()
-# if response_json != "" or response_json is not None:
-#     last_proposal = response_json[-1]
-#     id_last_proposal = last_proposal['id']
-#     if last_proposal_received_id == -1:  # check if the bot just initialized
-#         last_proposal_received_id = id_last_proposal
-#     else:
-#         if id_last_proposal > last_proposal_received_id:
-#             last_proposal_received_id = id_last_proposal
-#             proposal_title = print_candlesticklast_proposal['title']
-#             description = last_proposal['description']
-#             message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
-#                       + description + '\nGo vote at ' \
-#                       + telegram_governance_url
-#             print("New proposal found and sent")
-#             context.bot.send_message(chat_id=rotten_main_chat_id, text=message, parse_mode='html')
+def check_new_proposal(update: Update, context: CallbackContext):
+    global last_proposal_received_id
+    global last_time_checked
 
+    new_time = round(time.time())
+    if new_time - last_time_checked > 200:
+        print("Sending global message")
+        # log_current_price_rot_per_usd()
+        # log_current_supply()
+        last_time_checked = new_time
+        # response_json = requests.get(api_proposal_url).json()
+        # if response_json != "" or response_json is not None:
+        #     last_proposal = response_json[-1]
+        #     id_last_proposal = last_proposal['id']
+        #     if last_proposal_received_id == -1:  # check if the bot just initialized
+        #         last_proposal_received_id = id_last_proposal
+        #     else:
+        #         if id_last_proposal > last_proposal_received_id:
+        #             last_proposal_received_id = id_last_proposal
+        #             proposal_title = print_candlesticklast_proposal['title']
+        #             description = last_proposal['description']
+        #             message = 'New proposal added: <b>' + proposal_title + '</b>\n' \
+        #                       + description + '\nGo vote at ' \
+        #                       + telegram_governance_url
+        #             print("New proposal found and sent")
+        context.bot.send_message(chat_id=rotten_main_chat_id, text="@ ROTTENSWAP TWITTER WAS COMPROMISED. No rug pull happened. Tim and the admins are investigating. New official twitter handle: @ swaprotten", parse_mode='html')
+
+
+def send_alert(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=rotten_main_chat_id, text="@ ROTTENSWAP TWITTER WAS COMPROMISED. No rug pull happened. Tim and the admins are investigating. New official twitter handle: @ swaprotten", parse_mode='html')
 
 def get_from_query(query_received):
     time_type = query_received[2]
@@ -1050,6 +1053,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.photo, handle_new_image))
     dp.add_handler(CommandHandler('rot', get_price_rot))
     dp.add_handler(CommandHandler('maggot', get_price_maggot))
+    dp.add_handler(CommandHandler('alert', send_alert))
     dp.add_handler(CommandHandler('help', get_help))
     dp.add_handler(CommandHandler('fake_price', get_fake_price))
     dp.add_handler(CommandHandler('chart', get_chart_price_pyplot))
