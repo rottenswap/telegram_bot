@@ -711,6 +711,9 @@ def get_price_rot(update: Update, context: CallbackContext):
                   + "\nS.  Cap = " + supply_cat_pretty \
                   + "\nM.  Cap = $" + market_cap \
                   + "\nHolders = " + str(holders) + "</code>"
+    if random.randrange(10) > 7:
+        ad = get_ad()
+        message = message + "\n" + ad
     chat_id = update.message.chat_id
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='html')
 
@@ -938,6 +941,15 @@ def check_query(query_received):
     return time_type, time_start, k_hours, k_days, query_ok, simple_query, token
 
 
+def get_ad():
+    ads_file_path = BASE_PATH + "ads/chart_ads.txt"
+    with open(ads_file_path) as f:
+        content = f.readlines()
+    # you may also want to remove whitespace characters like `\n` at the end of each line
+    content = [x.strip() for x in content]
+    return random.choice(content)
+
+
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     global last_time_checked_price_candles
@@ -959,10 +971,9 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
             t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
 
             last_price = graphs_util.print_candlestick(token, t_from, t_to, candels_file_path)
-
-            caption = "Price of the last " + str(time_start) + str(time_type) + " of " + token + \
-                      ".\nCurrent price: <pre>$" + str(last_price)[0:7] + "</pre>" + \
-                      '\nWant this bot on your tg? -> contact @ rotted_ben.'
+            ad = get_ad()
+            caption = "<code>Price of the last " + str(time_start) + str(time_type) + " of " + token + \
+                      ".\nCurrent price: <pre>$" + str(last_price)[0:7] + "</pre></code>\n" + ad + ""
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
