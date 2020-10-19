@@ -1069,7 +1069,8 @@ def remove_add(update: Update, context: CallbackContext):
     global last_time_checked_ads
     if update.message.from_user.username == 'rotted_ben' or update.message.from_user.username == 'CryptoLynx':
         last_time_checked_ads = new_time
-        context.bot.send_video(chat_id=chat_id, video=BASE_PATH + 'videos/rot/ADS.mp4')
+
+        context.bot.send_video(chat_id=chat_id, video=open(BASE_PATH + 'videos/rot/ADS.mp4', 'rb'), supports_streaming=True)
 
 
 def main():
