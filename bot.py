@@ -711,7 +711,7 @@ def get_price_rot(update: Update, context: CallbackContext):
                   + "\nS.  Cap = " + supply_cat_pretty \
                   + "\nM.  Cap = $" + market_cap \
                   + "\nHolders = " + str(holders) + "</code>"
-    if random.randrange(10) > 7:
+    if random.randrange(10) > 6:
         ad = get_ad()
         message = message + "\n" + ad
     chat_id = update.message.chat_id
@@ -911,7 +911,9 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
             else:
                 caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
                     price[-1])[0:10] + "</pre>"
-
+            if random.randrange(10) > 6:
+                ad = get_ad()
+                caption = caption + "\n" + ad
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(chart_price_file_path, 'rb'),
                                    caption=caption,
@@ -972,8 +974,8 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
 
             last_price = graphs_util.print_candlestick(token, t_from, t_to, candels_file_path)
             ad = get_ad()
-            caption = "<code>Price of the last " + str(time_start) + str(time_type) + " of " + token + \
-                      ".\nCurrent price: <pre>$" + str(last_price)[0:7] + "</pre></code>\n" + ad + ""
+            caption = "Price of the last " + str(time_start) + str(time_type) + " of " + token + \
+                      ".\nCurrent price: <pre>$" + str(last_price)[0:7] + "</pre>\n" + ad + ""
 
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(candels_file_path, 'rb'),
@@ -1027,7 +1029,9 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
             else:
                 caption = "Supply of the last " + str(time_start) + str(
                     time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
-
+            if random.randrange(10) > 6:
+                ad = get_ad()
+                caption = caption + "\n" + ad
             context.bot.send_photo(chat_id=chat_id,
                                    photo=open(chart_supply_file_path, 'rb'),
                                    caption=caption,
