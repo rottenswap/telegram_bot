@@ -240,11 +240,8 @@ def get_url_meme():
 
 def send_meme_to_chat(update: Update, context: CallbackContext):
     url = get_url_meme()
-    caption = ""
-    if random.randrange(10) > 7:
-        caption = get_ad()
     chat_id = update.message.chat_id
-    context.bot.send_photo(chat_id=chat_id, photo=url, caption=caption, parse_mode='html')
+    context.bot.send_photo(chat_id=chat_id, photo=url)
 
 
 # tutorial on how to increase the slippage.
@@ -714,7 +711,7 @@ def get_price_rot(update: Update, context: CallbackContext):
                   + "\nS.  Cap = " + supply_cat_pretty \
                   + "\nM.  Cap = $" + market_cap \
                   + "\nHolders = " + str(holders) + "</code>"
-    if random.randrange(10) > 6:
+    if random.randrange(10) > 8:
         ad = get_ad()
         message = message + "\n" + ad
     chat_id = update.message.chat_id
@@ -914,7 +911,7 @@ def get_chart_price_pyplot(update: Update, context: CallbackContext):
             else:
                 caption = "Price of the last " + str(time_start) + str(time_type) + ".\nCurrent price: <pre>$" + str(
                     price[-1])[0:10] + "</pre>"
-            if random.randrange(10) > 6:
+            if random.randrange(10) > 8:
                 ad = get_ad()
                 caption = caption + "\n" + ad
             context.bot.send_photo(chat_id=chat_id,
@@ -1032,7 +1029,7 @@ def get_chart_supply_pyplot(update: Update, context: CallbackContext):
             else:
                 caption = "Supply of the last " + str(time_start) + str(
                     time_type) + ".\nCurrent supply: \n<b>ROT:</b> <pre>" + current_rot_str + "</pre> \n<b>MAGGOT:</b> <pre>" + current_maggot_str + "</pre>"
-            if random.randrange(10) > 6:
+            if random.randrange(10) > 8:
                 ad = get_ad()
                 caption = caption + "\n" + ad
             context.bot.send_photo(chat_id=chat_id,
