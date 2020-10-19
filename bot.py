@@ -128,6 +128,7 @@ last_time_checked_price_supply = 0
 last_time_checked_4chan = 0
 last_time_checked = 0
 last_time_checked_twitter = 0
+last_time_checked_ads = 0
 
 re_4chan = re.compile(r'^rot |rot$| rot |rotten|rotting|ROT')
 
@@ -944,12 +945,16 @@ def check_query(query_received):
 
 
 def get_ad():
-    ads_file_path = BASE_PATH + "ads/chart_ads.txt"
-    with open(ads_file_path) as f:
-        content = f.readlines()
-    # you may also want to remove whitespace characters like `\n` at the end of each line
-    content = [x.strip() for x in content]
-    return "AD: " + random.choice(content)
+    new_time = round(time.time())
+    if new_time - last_time_checked_ads > 3600:
+        ads_file_path = BASE_PATH + "ads/chart_ads.txt"
+        with open(ads_file_path) as f:
+            content = f.readlines()
+        # you may also want to remove whitespace characters like `\n` at the end of each line
+        content = [x.strip() for x in content]
+        return "AD: " + random.choice(content)
+    else:
+        return ""
 
 
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
@@ -1057,6 +1062,16 @@ def get_airdrop(update: Update, context: CallbackContext):
                              disable_web_page_preview=True)
 
 
+# remove ads for one hour ONLY if this command is sent by @rotted_ben or @CryptoLynx
+def remove_add(update: Update, context: CallbackContext):
+    new_time = round(time.time())
+    chat_id = update.message.chat_id
+    global last_time_checked_ads
+    if update.message.from_user.username == 'rotted_ben' or update.message.from_user.username == 'CryptoLynx':
+        last_time_checked_ads = new_time
+        context.bot.send_video(chat_id=chat_id, video=BASE_PATH + 'videos/rot/ADS.mp4')
+
+
 def main():
     updater = Updater(TELEGRAM_KEY, use_context=True)
     dp = updater.dispatcher
@@ -1079,6 +1094,7 @@ def main():
     dp.add_handler(CommandHandler('delete_meme_secret', delete_meme))
     dp.add_handler(CommandHandler('candlestick', get_candlestick_pyplot))
     dp.add_handler(CommandHandler('airdropinfo', get_airdrop))
+    dp.add_handler(CommandHandler('remove_adds', remove_add))
     # dp.add_handler(MessageHandler(Filters.text, check_new_proposal, pass_job_queue=True))
     RepeatedTimer(15, log_current_price_rot_per_usd)
     RepeatedTimer(60, log_current_supply)
