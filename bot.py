@@ -33,7 +33,6 @@ APP_SECRET = os.environ.get('TWITTER_API_KEY_SECRET')
 ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_SECRET_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 MEME_GIT_REPO = os.environ.get('MEME_GIT_REPO')
-TMP_FOLDER = os.environ.get('TMP_MEME_FOLDER')
 BASE_PATH = os.environ.get('BASE_PATH')
 
 ethexplorer_holder_base_url = "https://ethplorer.io/service/service.php?data="
@@ -529,7 +528,10 @@ def delete_meme(update: Update, context: CallbackContext):
 def get_number_holder_token(token):
     url = ethexplorer_holder_base_url + token
     res = requests.get(url).json()
-    holders = res['pager']['holders']['records']
+    try:
+        holders = res['pager']['holders']['records']
+    except KeyError:
+        holders = -1
     return int(holders)
 
 
