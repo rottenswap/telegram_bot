@@ -240,8 +240,11 @@ def get_url_meme():
 
 def send_meme_to_chat(update: Update, context: CallbackContext):
     url = get_url_meme()
+    caption = ""
+    if random.randrange(10) > 7:
+        caption = get_ad()
     chat_id = update.message.chat_id
-    context.bot.send_photo(chat_id=chat_id, photo=url)
+    context.bot.send_photo(chat_id=chat_id, photo=url, caption=caption, parse_mode='html')
 
 
 # tutorial on how to increase the slippage.
