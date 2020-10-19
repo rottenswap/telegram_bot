@@ -240,11 +240,11 @@ def get_url_meme():
 
 
 def send_meme_to_chat(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
     if update.message.from_user.username == 'official_noobsaibot':
-        context.bot.send_message(text="Shut mouth noob")
+        context.bot.send_message(chat_id=chat_id, text="Shut mouth noob")
     else:
         url = get_url_meme()
-        chat_id = update.message.chat_id
         context.bot.send_photo(chat_id=chat_id, photo=url)
 
 
