@@ -948,16 +948,16 @@ def check_query(query_received):
 
 
 def get_ad():
-    new_time = round(time.time())
-    if new_time - last_time_checked_ads > 3600:
-        ads_file_path = BASE_PATH + "ads/chart_ads.txt"
-        with open(ads_file_path) as f:
-            content = f.readlines()
-        # you may also want to remove whitespace characters like `\n` at the end of each line
-        content = [x.strip() for x in content]
-        return "AD: " + random.choice(content)
-    else:
-        return ""
+    # new_time = round(time.time())
+    # if new_time - last_time_checked_ads > 3600:
+    #     ads_file_path = BASE_PATH + "ads/chart_ads.txt"
+    #     with open(ads_file_path) as f:
+    #         content = f.readlines()
+    #     # you may also want to remove whitespace characters like `\n` at the end of each line
+    #     content = [x.strip() for x in content]
+    #     return "AD: " + random.choice(content)
+    # else:
+    return ""
 
 
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
